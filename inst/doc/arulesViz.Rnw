@@ -1,48 +1,47 @@
-\documentclass[10pt,a4paper]{article}
+%\documentclass[10pt,a4paper]{article}
+\documentclass[nojss]{jss}
 
-\usepackage{a4wide}
+\usepackage[utf8]{inputenc}
+
+%\usepackage{a4wide}
 \usepackage{amsfonts}
-\setlength{\parskip}{0.5ex plus0.1ex minus0.1ex}
-\setlength{\parindent}{0em}
+%\setlength{\parskip}{0.5ex plus0.1ex minus0.1ex}
+%\setlength{\parindent}{0em}
 
-\usepackage[round,longnamesfirst]{natbib}
-\usepackage{hyperref}
-\usepackage{verbatim}
+%\usepackage[round,longnamesfirst]{natbib}
+%\usepackage{hyperref}
+%\usepackage{verbatim}
 %%% for tabulars
 %\usepackage{rotating}
 %\usepackage{multirow}
 
 
-\newcommand{\strong}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+%\newcommand{\strong}[1]{{\normalfont\fontseries{b}\selectfont #1}}
 \newcommand{\class}[1]{\mbox{\textsf{#1}}}
 \newcommand{\func}[1]{\mbox{\texttt{#1()}}}
-\newcommand{\code}[1]{\mbox{\texttt{#1}}}
-\newcommand{\pkg}[1]{\strong{#1}}
+%\newcommand{\code}[1]{\mbox{\texttt{#1}}}
+%\newcommand{\pkg}[1]{\strong{#1}}
 \newcommand{\samp}[1]{`\mbox{\texttt{#1}}'}
-\newcommand{\proglang}[1]{\textsf{#1}}
+%\newcommand{\proglang}[1]{\textsf{#1}}
 \newcommand{\set}[1]{\mathcal{#1}}
 
 \newcommand{\mat}[1]{\mathbf{#1}}
 
-\usepackage{Sweave}
+%\usepackage{Sweave}
 %% \VignetteIndexEntry{Visualizing Association Rules: Introduction to arulesViz}
 
+%\title{Visualizing Association Rules: Introduction to the R-extension Package \pkg{arulesViz}}
 
-\begin{document}
-<<echo=FALSE>>=
-options(width = 75)
-### for sampling
-set.seed(1234)
-@
-%% ------------------------------------------------------------------
-%% ------------------------------------------------------------------
+\author{Michael Hahsler\\Southern Methodist University \And
+	Sudheer Chelluboina\\Southern Methodist University}	    
 \title{Visualizing Association Rules: Introduction to the R-extension Package \pkg{arulesViz}}
-\author{Michael Hahsler and Sudheer Chelluboina}
-\maketitle
-\sloppy
-%% ------------------------------------------------------------------
-%% ------------------------------------------------------------------
-\begin{abstract}
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Michael Hahsler, Sudheer Chelluboina} %% comma-separated
+\Plaintitle{Visualizing Association Rules: Introduction to the R-extension Package rulesViz}
+\Shorttitle{Visualizing Association Rules} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
 Association rule mining is a popular data mining method available in R as the
 extension package~\pkg{arules}.  However, mining association rule often results
 in a very large number of found rules, leaving the analyst with the task to go
@@ -53,7 +52,51 @@ selecting and zooming. In this paper we present the R-extension
 package~\pkg{arulesViz} which implements several known and novel visualization
 techniques to explore association rules.
 With examples we show how these visualization techniques can be used to analyze a data set.
-\end{abstract}
+    }
+\Keywords{data mining, association rules, visualization}
+\Plainkeywords{data mining, association rules, visualization} %% without formatting
+
+
+\Address{
+    Michael Hahsler\\
+    Computer Science and Engineering\\
+    Lyle School of Engineering\\
+    Southern Methodist University\\
+    P.O. Box 750122 \\
+    Dallas, TX 75275-0122\\
+    E-mail: \email{mhahsler@lyle.smu.edu}\\
+    URL: \url{http://lyle.smu.edu/~mhahsler}
+}
+
+
+
+
+\begin{document}
+<<echo=FALSE>>=
+options(width = 75)
+### for sampling
+set.seed(1234)
+@
+%% ------------------------------------------------------------------
+%% ------------------------------------------------------------------
+%\title{Visualizing Association Rules: Introduction to the R-extension Package \pkg{arulesViz}}
+%\author{Michael Hahsler and Sudheer Chelluboina}
+\maketitle
+\sloppy
+%% ------------------------------------------------------------------
+%% ------------------------------------------------------------------
+%\begin{abstract}
+%Association rule mining is a popular data mining method available in R as the
+%extension package~\pkg{arules}.  However, mining association rule often results
+%in a very large number of found rules, leaving the analyst with the task to go
+%through all the rules and discover interesting ones. Sifting manually through
+%large sets of rules is time consuming and strenuous. Visualization has a long
+%history of making large data sets better accessible using techniques like
+%selecting and zooming. In this paper we present the R-extension
+%package~\pkg{arulesViz} which implements several known and novel visualization
+%techniques to explore association rules.
+%With examples we show how these visualization techniques can be used to analyze a data set.
+%\end{abstract}
 
 %% ------------------------------------------------------------------
 %% ------------------------------------------------------------------
@@ -1060,7 +1103,7 @@ using for example \pkg{iplots}~\citep{arulesViz:Urbanek:2003}
 which supports in addition to selection and zooming
 also brushing and linking between different plots.
 
-\bibliographystyle{abbrvnat}
+%\bibliographystyle{abbrvnat}
 \bibliography{arulesViz,arules}
 
 

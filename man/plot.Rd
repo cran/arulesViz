@@ -64,7 +64,8 @@ the color of the points represents the length (order) of the rule.
 This is used for two-key plots.
 The list of control parameters for this method is "pch" 
 (use filled symbols: 20--25),
-"cex", "xlim" and "ylim", "main".
+"cex", "xlim" and "ylim", "main", "jitter" 
+(a number greater than 0 adds jitter to the points).
 Interactive manipulations are available.
 
 \emph{matrix, matrix3D} 
