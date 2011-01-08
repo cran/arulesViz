@@ -11,7 +11,8 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 		    zlim = NULL,
 		    alpha = NULL,
 		    gray_range = c(.1,.8),
-		    newpage = TRUE
+		    newpage = TRUE,
+		    jitter = 0
 		    ), control)
 
 
@@ -230,7 +231,13 @@ scatterplot_int <- function(rules, measures, shading, control, ...){
 		    just = c("left", "bottom")))
     
     x <- q[, c(measures[1], measures[2])]
-   
+    
+    if(control$jitter >0) {
+	x[,1] <- jitter(x[,1], factor=control$jitter)
+	x[,2] <- jitter(x[,2], factor=control$jitter)
+    }
+
+
     ## get colors for shading
     if(!is.na(shading)) {
 	col <- 1-map(q[[shading]], 
