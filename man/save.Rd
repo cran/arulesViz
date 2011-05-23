@@ -1,52 +1,40 @@
-\name{saveDot}
+\name{saveAsGraph}
 \Rdversion{1.1}
-\alias{saveDot}
-\alias{saveGraphML}
+\alias{saveAsGraph}
 \title{
-Save rule set as a graph description.
+Save rules or itemsets as a graph description.
 }
 \description{
 This function 
-saves a rule sat as a graph description in Graphviz's dot or GraphML format.
+saves a rule sat as a graph description in different formats 
+(e.g., GraphML, dimacs, dot).
 }
 \usage{
-saveDot(x, file)
-saveGraphML(x, file, trans=NULL)
+saveAsGraph(x, file, type=NULL, format="graphml")
 }
 \arguments{
-  \item{x}{ an object of class "rules"}
+  \item{x}{ an object of class "rules" or "itemsets".}
   \item{file}{ file name}
-  \item{trans}{ transactions used to generate the rules. If transactions are
-    provided then the GraphML definition will contain support information
-    for all nodes (itemsets)}
+  \item{type}{ see type in plot with method "graph" 
+  (e.g., "itemsets", "items").}
+  \item{format}{ file format (e.g., "edgelist", 
+  "graphml", "dimacs", "gml", "dot"). See \code{write.graph} in package 
+  \pkg{igraph}.}
 }
                             
-%%\details{
-%%  ~~ If necessary, more details than the description above ~~
-%}
-%\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-%}
-%\references{
-%% ~put references to the literature/web site here ~
-%}
-%\author{
-%%  ~~who you are~~
-%}
-%\note{
-%%  ~~further notes~~
-%}
+%\details{}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+\seealso{
+\code{\link{plot}}, \code{\link[igraph]{write.graph}} in \pkg{igraph}
+}
+\examples{
+data("Groceries")
+rules <- apriori(Groceries, parameter=list(support=0.01, confidence=0.5))
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
-%\examples{
-%}
-%\keyword{ ~kwd1 }
+saveAsGraph(rules, "rules.graphml")
+
+## clean up
+unlink("rules.graphml")
+}
+\keyword{ file }
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

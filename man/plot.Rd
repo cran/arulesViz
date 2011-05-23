@@ -4,26 +4,26 @@
 \alias{plot.itemsets}
 \alias{plot.rules}
 \title{
-Plot method to visualize association rules.
+Plot method to visualize association rules and itemsets.
 }
 \description{
 This is the S3 method to visualize association rules and itemsets.
 Implemented are several popular visualization methods 
 including scatter plots with shading (two-key plots), 
-graph based visualizations
-and doubledecker plots.
+graph based visualizations, doubledecker plots, etc.
 }
 \usage{
-\method{plot}{rules}(x, method = NULL, measure = "support", shading = "lift", interactive = FALSE, data = NULL, control = NULL, ...)
-\method{plot}{itemsets}(x, method = NULL, measure = "support", interactive=FALSE, data = NULL, control = NULL, ...)
+\method{plot}{rules}(x, method = NULL, measure = "support", shading = "lift", 
+    interactive = FALSE, data = NULL, control = NULL, ...)
+\method{plot}{itemsets}(x, method = NULL, measure = "support", 
+    interactive=FALSE, data = NULL, control = NULL, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an object of class "rules" or "itemsets". }
   \item{method}{ a string with value "scatterplot", "two-key plot", "matrix", 
   "matrix3D",  "mosaic", 
   "doubledecker", "graph", "paracoord" or "grouped", "iplots" selecting the 
-  visualization method (see details section).}
+  visualization method (see Details).}
   
   \item{measure}{ measure(s) of interestingness 
   (e.g., "support", "confidence", "lift") used in the visualization. Some 
@@ -32,130 +32,172 @@ and doubledecker plots.
   can be used to suppress using a measure. }
   
   \item{shading}{ measure of interestingness used
-  for the color of the points/arrows visualized
+  for the color of the points/arrows/nodes
   (e.g., "support", "confidence", "lift"). The default is "lift".
   \code{NA} can be often used to suppress shading.}
   
-  \item{interactive}{ enable interactive exploration (not implemented for
-  each method).}
+  \item{interactive}{ enable interactive exploration (not implemented by 
+  all methods).}
   
   \item{control}{ a list of control parameters for the plot. The available
-  control parameters depends on the visualization technique. Some 
-  parameters are 
-  col, kind, itemlabels, reorder, orderBy, interactive, xscale, 
-  yscale, pch and size.}
+  control parameters depends on the visualization technique (see Details).}
   
   \item{data}{  the dataset (class "transactions") 
   used to generate the rules/itemsets. Only 
   "mosaic" and "doubledecker" require the original data.}
   
   \item{\dots}{ further arguments are typically passed on to the 
-  used plotting function. }
+  used low-level plotting function. }
 }
 \details{
-Here are some details for each visualization method.
+Most visualization techniques are described by Bruzzese and Davino (2008),
+however, we added more color shading, reordering and interactive features.
+The following visualization method are available:
 
-\emph{scatterplot, two-key plot} 
+\describe{
+\item{"scatterplot", "two-key plot"}{ 
 This visualization method draws a two dimensional scatterplot with different
 measures of interestingness (parameter "measure") on the axes and a third 
-measure (parameter "shading") is represented by the points color. 
-There is a special value for shading called "order". With this value
-the color of the points represents the length (order) of the rule.
-This is used for two-key plots.
-The list of control parameters for this method is "pch" 
-(use filled symbols: 20--25),
-"cex", "xlim" and "ylim", "main", "jitter" 
-(a number greater than 0 adds jitter to the points).
-Interactive manipulations are available.
+measure (parameter "shading") is represented by the color of the points. 
+There is a special value for shading called "order" which produces a
+two-key plot where the color of the points represents the length (order) 
+of the rule.
 
-\emph{matrix, matrix3D} 
+The list of control parameters for this method is 
+\describe{
+\item{"main"}{plot title}
+\item{"pch"}{ use filled symbols: 20--25}
+\item{"cex"}{symbol size}
+\item{"xlim","ylim"}{limits}
+\item{"jitter"}{a number greater than 0 adds jitter to the points}
+}
+
+Interactive manipulations are available.
+}
+
+\item{"matrix", "matrix3D"}{ 
 Arranges the association rules as a matrix with the itemsets in the antecedents
 on one axis and the itemsets in the consequent on the other.  The interest
 measure is either visualized by a color (darker means a higher value for the
-measure) or as the height of a bar (\code{type="3D"} for control).
-For convenience the method name "matrix3D" is also provided.
+measure) or as the height of a bar (method "matrix3D").
+
 The list of control parameters for this method is
-"main", "col", "reorder", "orderBy", "reorderMethod", "reorderControl" 
-and "type".
-Type can be "grid", "image" or "3D" (scatterplot3D) and defines the way the data is rendered. 
-\code{...} arguments are passed on to the respective plotting function.
-
-If reorder is set to TRUE, then the itemsets on the x and y-axes
+\describe{
+\item{"main"}{plot title}
+\item{"type"}{defines the way the data is rendered: "grid", "image" 
+or "3D" (scatterplot3d)}
+\item{"reorder"}{ if \code{TRUE} then the itemsets on the x and y-axes
 are reordered to bring rules with similar values for the interest measure
-closer together and make the plot clearer. Orderby specifies the measure of 
-interest for reordering (default is the visualized measure). 
-ReorderMethod and reorderControl
-contain the seriation method and control arguments
-used for reordering (see \code{seriation()} method in \pkg{seriation}).
+closer together and make the plot clearer.}
+\item{"orderBy"}{specifies the measure of
+interest for reordering (default is the visualized measure)}
+\item{"reorderMethod","reorderControl","reorderDist"}{seriation method, control arguments and distance method (default "euclidean")
+used for reordering (see \code{seriate()} method in \pkg{seriation})}
+\item{"col"}{ a vector of n colors used for the plot (default: 100 gray values)}
+\item{"xlim","ylim"}{limits}
+}
 
-\emph{grouped}
-Grouped matrix-based visualization. Antecedents (columns) in the matrix are
+Currently there is no interactive version available.
+}
+
+\item{"grouped"}{
+Grouped matrix-based visualization (Hahsler and Chelloboina, 2011). 
+Antecedents (columns) in the matrix are
 grouped using clustering. Groups are represented as balloons
 in the matrix.
+
 The list of control parameters for this method is
-"main", "k" (number of groups), "aggr.fun". 
-The aggregation function
-can be any function computing a scalar from a vector 
-(e.g., min, mean, median (default), sum, max). It is also used 
-to reorder the balloons in the plot.
+\describe{
+\item{"main"}{plot title}
+\item{"k"}{number of antecedent groups (default: 20)}
+\item{"aggr.fun"}{aggregation function
+can be any function computing a scalar from a vector
+(e.g., min, mean, median (default), sum, max). It is also used
+to reorder the balloons in the plot.}
+}
 
 Interactive manipulations are available. 
+}
 
-\emph{graph}
+\item{"graph"}{
 Represents the rules (or itemsets) as a graph.
-Control arguments are "main", "type", "nodeColors",
-"nodeLabels" and "edgeLabels".
-Type can be "itemsets" (default), "items" or "bipartite". 
-Control arguments are "main",
-"nodeColors",
-"nodeLabels" (\code{TRUE} - use item/itemset names instread of ids),
-"edgeLabels" (\code{FALSE} - plot values of interest measures),
-"precision" (for plotting measures),
-"layout" (use a different graphviz layout, e.g., dot, neato, fdp, circo).
-Note: package Rgraphviz is required.
-%% itemsets missing
 
-\emph{doubledecker, mosaic}
+Control arguments are 
+\describe{
+\item{"main"}{plot title}
+\item{"cex"}{cex for labels}
+\item{"itemLabels"}{display item/itemset names instead of ids (\code{TRUE})}
+\item{"measureLabels"}{display values of interest measures (\code{FALSE})}
+\item{"precision"}{ number of digits for numbers in plot.}
+\item{"type"}{plot type: "items" or "itemsets"}
+\item{"layout"}{layout algorithm defined in \pkg{igraph}
+    (default: layout.fruchterman.reingold)}
+\item{"arrowSize"}{[0,1]}
+\item{"alpha"}{ alpha transparency value (default .8; set to 1 for no transparency)}
+}
+
+The used plot function is \code{plot} in \pkg{igraph}. For the
+interactive version \code{tkplot} in \pkg{igraph} is used.
+\code{...} arguments are passed on to the respective plotting function.
+}
+
+\item{"doubledecker", "mosaic"}{
 Represents a single rule as a doubledecker or mosaic plot.
 Parameter data has to be specified to compute the needed contingency
-table. Control parameters are "main".
+table.
+Available control parameters are
+\describe{
+\item{"main"}{plot title}
+}
+}
 
-\emph{paracoord}
+\item{"paracoord"}{
 Represents the rules (or itemsets) as a parallel coordinate plot.
+Available control parameters are
+\describe{
+\item{"main"}{plot title}
+\item{"reorder"}{reorder to minimize crossing lines.}
+\item{"alpha"}{ alpha transparency value}
+}
 
+Currently there is no interactive version available.
+}
 
-\emph{iplots}
-Uses interactive plots (package iplots) which support selection, highlighting, 
+\item{"iplots"}{
+Experimental interactive plots (package \pkg{iplots}) 
+which support selection, highlighting, 
 brushing, etc. Currently plots a scatterplot (support vs. confidence) and
-several histograms. 
-Interactive manipulations are available. 
+several histograms. Interactive manipulations are available. 
+}
 
 }
-%\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-%}
-%\references{
-%% ~put references to the literature/web site here ~
-%}
+}
+\value{
+Several interactive plots return a set of selected rules/itemsets. Other plots
+might return other data structures. For example graph-based
+plots return the graph (invisibly).
+}
 \author{
-%%  ~~who you are~~
 Michael Hahsler and Sudheer Chelluboina. Some visualizations are based on 
 the implementation by Martin Vodenicharov.
 }
-%\note{
-%%  ~~further notes~~
-%}
+\references{
+Bruzzese, D. and Davino, C. (2008), Visual Mining of Association Rules, in
+Visual Data Mining: Theory, Techniques and Tools for Visual Analytics,
+Springer-Verlag, pp. 103--122.
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+Hahsler M. and Chelluboina S. (2011), Visualizing association rules in
+hierarchical groups. In 42nd Symposium on the Interface: Statistical, Machine
+Learning, and Visualization Algorithms (Interface 2011). The Interface
+Foundation of North America.
+}
 
-%\seealso{
-%scatterplot3d, levelplot, mosaic, doubledecker
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+\code{\link[scatterplot3d]{scatterplot3d}} in \pkg{scatterplot3d},
+\code{\link[igraph]{plot.igraph}} and
+\code{\link[igraph]{tkplot}} in \pkg{igraph},
+\code{\link[seriation]{seriate}} in \pkg{seriation}
+}
 \examples{
 data(Groceries)
 rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5))
@@ -195,9 +237,9 @@ plot(rules, method="grouped", control=list(k=30))
 subrules2 <- sample(rules, 10)
 plot(subrules2, method="graph")
 plot(subrules2, method="graph", 
-	control=list(type="bipartite"))
-plot(subrules2, method="graph", 
 	control=list(type="items"))
+## try: plot(subrules2, method="graph", interactive=TRUE)
+
 
 ## parallel coordinates plot
 plot(subrules2, method="paracoord")
@@ -207,7 +249,7 @@ plot(subrules2, method="paracoord", control=list(reorder=TRUE))
 oneRule <- sample(rules, 1)
 plot(oneRule, method="doubledecker", data = Groceries)
 
-## use iplots
+## use iplots (experimental)
 ## try: sel <- plot(rules, method="iplots", interactive=TRUE)
 
 
@@ -216,5 +258,5 @@ itemsets <- eclat(Groceries, parameter = list(support = 0.02))
 plot(itemsets, method="paracoord", control=list(alpha=.5, reorder=TRUE))
 plot(itemsets, method="graph")
 }
-%\keyword{ ~kwd1 }
+\keyword{ hplot }
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

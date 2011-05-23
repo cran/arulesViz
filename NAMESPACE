@@ -1,6 +1,6 @@
 import(arules)
 
-export(abbreviate, saveDot, saveGraphML)
+export(abbreviate, saveAsGraph)
 
 S3method(plot, rules)
 S3method(plot, itemsets)

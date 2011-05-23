@@ -217,7 +217,7 @@ sets of values of a selected interest measure.
 The rest of the paper is organized as follows.
 In Section~\ref{sec:prep} we give a very short example
 of how to prepare data using package~\pkg{arules} and then introduce
-the unified interface provides by ~\pkg{arulesViz} for association
+the unified interface provided by ~\pkg{arulesViz} for association
 rule visualization.
 In Sections~\ref{sec:scatter} to \ref{sec:doubledecker} we describe
 the different visualization techniques and give examples.
@@ -650,7 +650,8 @@ Matrix-based visualization is limited in the number of
 rules it can visualize effectively
 since large sets of rules typically also have large sets of
 unique antecedents/consequents. Here we introduce a new visualization
-techniques that enhances matrix-based visualization using grouping of rules
+techniques~\citep{arulesViz:Hahsler2011} 
+that enhances matrix-based visualization using grouping of rules
 via clustering to handle a larger number of rules. Grouped rules
 are presented as an aggregate in the matrix and can be explored
 interactively by zooming into and out of groups.
@@ -807,23 +808,8 @@ plot(subrules2, method="graph")
 \label{fig:graph1}}
 \end{figure}
 
-The ``bipartite'' version splits the set of itemsets
-into two separate vertex sets, one for each antecedents and consequences
-(shown in Figure~\ref{fig:graph2}).
 
-<<graph2, fig=TRUE, height=10, include=FALSE>>=
-plot(subrules2, method="graph",
-        control=list(type="bipartite"))
-@
-
-\begin{figure}
-\centering
-\includegraphics[width=10cm]{arulesViz-graph2}
-\caption{Graph-based visualization with two separate sets of itemsets (antecedent and consequent sets).
-\label{fig:graph2}}
-\end{figure}
-
-The third variant uses items and rules as two types of vertices and
+Another variant uses items and rules as two types of vertices and
 edges indicate which items occur in which rule.
 
 <<graph3, fig=TRUE, width=10, height=10, include=FALSE>>=
@@ -850,11 +836,12 @@ and exploration platforms for
 networks and graphs like \emph{Gephi}~\citep{arules:Bastian:2009}.
 From \pkg{arulesViz} graphs for sets of association rules can be exported
 as a Graphviz dot-file~\citep{arules:Gentry:2010}
+or in the GraphML format
 to be explored in tools like Gephi. For example the
 1000 rules with the highest lift are exported by:
 
 <<eval=FALSE>>=
-saveDot(head(sort(rules, by="lift"),1000), file="rules.dot")
+saveAsGraph(head(sort(rules, by="lift"),1000), file="rules.graphml")
 #saveGraphML(head(sort(rules, by="lift"),1000), file="rules.graphml")
 @
 
