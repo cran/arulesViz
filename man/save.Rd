@@ -11,13 +11,14 @@ saves a rule sat as a graph description in Graphviz's dot or GraphML format.
 }
 \usage{
 saveDot(x, file)
-saveGraphML(x, file, measure="support")
+saveGraphML(x, file, trans=NULL)
 }
 \arguments{
   \item{x}{ an object of class "rules"}
   \item{file}{ file name}
-  \item{measure}{ an interest measure used as the attribure for edges 
-    (e.g. \code{"support"})}
+  \item{trans}{ transactions used to generate the rules. If transactions are
+    provided then the GraphML definition will contain support information
+    for all nodes (itemsets)}
 }
                             
 %%\details{

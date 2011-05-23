@@ -1,13 +1,12 @@
-clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
+grouped_matrix_arules <- function(rules, measure, shading, control=NULL, ...){
 
     ## measure controls circle size
     ## shading controls color
 
     control <- .get_parameters(list(
-		    main =paste("Cluster plot for", length(rules), "rules"),
+		    main =paste("Grouped matrix for", length(rules), "rules"),
 		    k = 20,
 		    aggr.fun=median, 
-		    order.fun=rowMeans, 
 		    ## fix lift so serveral plots are comparable (NA: take max)
 		    max.shading=NA,
 		    interactive = FALSE,
@@ -15,9 +14,9 @@ clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
 		    ), control)
 
 
-    x <- clusterplot_int(rules, measure, shading,
+    x <- grouped_matrix_int(rules, measure, shading,
 	    k=control$k, 
-	    aggr.fun=control$aggr.fun, order.fun=control$order.fun, 
+	    aggr.fun=control$aggr.fun, 
 	    max.shading=control$max.shading 
 	    )
 
@@ -25,7 +24,11 @@ clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
 
     ## interactive mode
     cat("Interactive mode.\n")
-    seekViewport("clusterplot")
+    
+    ## fix max.shading
+    control$max.shading <- x$max.shading
+
+    seekViewport("grouped_matrix")
 
     ## draw buttons
     gI <- gInteraction(data.frame(
@@ -62,7 +65,7 @@ clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
 	select <- convertLoc(selection(gI)$loc,
 		"native", valueOnly=TRUE)$x
 	if(is.null(select)) {
-	    cat("Select a lhs first!\n")
+	    cat("Select a LHS first!\n")
 	    gI <- resetButtons(gI)
 	    next
 	}
@@ -73,7 +76,7 @@ clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
 	    select <- get_order(x$order[2])[select]
 	    rulesSelected <- rules[x$cl==select]
 	}else{
-	    cat("Illegal selection! Choose a lhs.\n")
+	    cat("Illegal selection! Choose a LHS.\n")
 	    next
 	}
 
@@ -86,14 +89,14 @@ clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
 		
 	    cat("Zooming in. This might take a while\n")
 
-	    ret <- clusterplot_arules(rulesSelected, measure, 
+	    ret <- grouped_matrix_arules(rulesSelected, measure, 
 		    shading, control, ...)
 
 	    if(!identical(ret, "zoom out")) return(ret)
 
 	    ## we come back up so replot
 	    plot(x)
-	    seekViewport("clusterplot")
+	    seekViewport("grouped_matrix")
 	    gI <- resetButtons(gI)
 	}
 
@@ -101,7 +104,7 @@ clusterplot_arules <- function(rules, measure, shading, control=NULL, ...){
 		cat("Selected rules:\n")
 		## FIXME: click on bubble
 		#selectRHS <- round(as.numeric(convertY(location$Y, "native")))
-		inspect(SORT(rulesSelected, by="lift"))
+		inspect(sort(rulesSelected, by="lift"))
 		gI <- changeButton(gI, "inspect", FALSE)
 	    }
 
@@ -123,9 +126,9 @@ rowMaxs <- function(x, na.rm=FALSE) apply(x, MARGIN=1, max, na.rm=na.rm)
     ma
 }
 
-## create an clusterplot
-clusterplot_int <- function(rules, measure, shading,
-	k=15, aggr.fun=median, order.fun=rowMeans, max.shading=NA) {
+## create an grouped_matrix
+grouped_matrix_int <- function(rules, measure, shading,
+	k=15, aggr.fun=median, max.shading=NA) {
 
     ## check k
     if(length(unique(lhs(rules)))< k) k <- length(unique(lhs(rules)))
@@ -147,10 +150,11 @@ clusterplot_int <- function(rules, measure, shading,
     sAggr <- .aggr(s, km, aggr.fun)
 
     ## reorder for shading
-    order.fun <- rowMeans
     order <- ser_permutation(
-	    order(order.fun(sAggr, na.rm=TRUE), decreasing=TRUE),
-	    order(order.fun(t(sAggr), na.rm=TRUE), decreasing=TRUE)
+	    order(apply(sAggr, MARGIN=1, FUN=aggr.fun, na.rm=TRUE), 
+		    decreasing=TRUE),
+	    order(apply(sAggr, MARGIN=2, FUN=aggr.fun, na.rm=TRUE), 
+		    decreasing=TRUE)
 	    )
 
     cl <- vector()
@@ -162,9 +166,9 @@ clusterplot_int <- function(rules, measure, shading,
 
     ret <- list(rules=rules, measure=measure, shading=shading, 
 	    cl=cl, km= km, max.shading=max.shading, 
-	    order.fun=order.fun, aggr.fun=aggr.fun, 
+	    aggr.fun=aggr.fun, 
 	    order=order, k=k, sAggr=sAggr, mAggr=mAggr)
-    class(ret) <- "clusterplot"
+    class(ret) <- "grouped_matrix"
 
     ## call plotting work horse
     plot(ret)
@@ -172,23 +176,20 @@ clusterplot_int <- function(rules, measure, shading,
     ret
 }
 
-## display clusterplot
-plot.clusterplot <- function(x) {
+## display grouped_matrix
+plot.grouped_matrix <- function(x) {
     ## circle size
     sn <- x$mAggr
     ## shading
     ln <- x$sAggr
     
-    #sn <- .aggr(rulesAsMatrix(x$rules, "support"), x$km, x$aggr.fun)
-    #ln <- .aggr(rulesAsMatrix(x$rules, "lift"), x$km, x$aggr.fun)
-
     ## get most important item in the lhs
     f <- lapply(split(x$rules, x$cl), FUN = function(r) itemFrequency(lhs(r)))
     most_imp_item <- lapply(f, FUN = 
 	    function(f) paste(names(which.max(f)), " +",sum(f>0)-1, 
 		    sep=""))
 
-    clusterplot_plot_int(
+    grouped_matrix_plot_int(
 	    x = map(sn, c(0.2,1)), 
 	    y = map(ln, range = c(1,.2), 
 		    from.range = c(min(x$sAggr, na.rm=TRUE), x$max.shading)),
@@ -206,15 +207,15 @@ plot.clusterplot <- function(x) {
 	    )
 }
 
-## inspect rules inside an clusterplot
-inspect.clusterplot <- function(x, cluster, measure="lift") {
-    inspect(SORT(x$rules[x$cl==cluster], by=measure))
+## inspect rules inside an grouped_matrix
+inspect.grouped_matrix <- function(x, cluster, measure="lift") {
+    inspect(sort(x$rules[x$cl==cluster], by=measure))
 }
 
 
 ## workhorse for plotting
 ## based on bertinplot in package seriation
-clusterplot_plot_int <- function (x, y, order = NULL, options = NULL) {
+grouped_matrix_plot_int <- function (x, y, order = NULL, options = NULL) {
     if (!is.matrix(x)) 
     	stop("Argument 'x' must be a matrix.")
 
@@ -274,7 +275,7 @@ clusterplot_plot_int <- function (x, y, order = NULL, options = NULL) {
 		    #xscale = c(1, nrow(x)), yscale = c(1, ncol(x)), 
 		    xscale = c(.5, nrow(x)+.5), yscale = c(.5, ncol(x)+.5), 
 		    default.units = "native", gp=options$gp_labels,
-		    name="clusterplot"))
+		    name="grouped_matrix"))
 
     ## grid
     yLabPos <- unit(ncol(x), "native")
@@ -315,12 +316,12 @@ clusterplot_plot_int <- function (x, y, order = NULL, options = NULL) {
 
     ## add lhs, rhs
     gp <- gpar(fontface = "bold", cex = 1.2)
-    grid.text("lhs", 
+    grid.text("LHS", 
 	    x = unit(1, "native")-unit(1,"lines"), y = yLabPos, 
 	    rot = 90, just = "left", 
 	    default.units = "native", 
 	    gp = gp)
-    grid.text("rhs", x = xLabPos,  
+    grid.text("RHS", x = xLabPos,  
 	    y = unit(ncol(x), "native")+unit(1,"lines"), 
 	    just = "left", 
 	    default.units = "native", gp = gp)

@@ -73,30 +73,30 @@ matrix_int <- function(rules, measure, control, ...){
 
     }
 
-    writeLines("Itemsets in Antecedent (lhs)")
+    writeLines("Itemsets in Antecedent (LHS)")
     print(colnames(m))
-    writeLines("Itemsets in Consequent (rhs)")
+    writeLines("Itemsets in Consequent (RHS)")
     print(rownames(m))
 
 
     if (control$type == "image") {
-	image(t(m), col = control$col, xlab = "Antecedent (lhs)", 
-		ylab = "Consequent (rhs)", main = control$main, 
+	image(t(m), col = control$col, xlab = "Antecedent (LHS)", 
+		ylab = "Consequent (RHS)", main = control$main, 
 		sub=paste("Measure:", measure), axes=FALSE, ...)
 	axis(1, labels=1:ncol(m), at=(0:(ncol(m)-1))/(ncol(m)-1))
 	axis(2, labels=1:nrow(m), at=(0:(nrow(m)-1))/(nrow(m)-1))
     }
     else if (control$type == "3d") {
 	df <- cbind(which(!is.na(m), arr.ind=TRUE), as.vector(m[!is.na(m)]))
-	scatterplot3d(df, zlab = measure, xlab="Consequent (rhs)", 
-		ylab= "Antecedent (lhs)", main = control$main,
+	scatterplot3d(df, zlab = measure, xlab="Consequent (RHS)", 
+		ylab= "Antecedent (LHS)", main = control$main,
 		type="h", pch="", ...)
     }
     else
     {
 	#dimnames(m) <- NULL
-	#plot(levelplot(t(m), xlab = "Antecedent (lhs)", 
-	#		ylab = "Consequent (rhs)", 
+	#plot(levelplot(t(m), xlab = "Antecedent (LHS)", 
+	#		ylab = "Consequent (RHS)", 
 	#		main = control$main, aspect = "fill", 
 	#		cuts = 20, col.regions = control$col, 
 	#		sub=paste("Measure:", measure), ...))
@@ -119,7 +119,7 @@ matrix_int <- function(rules, measure, control, ...){
 	cols[] <- gray(cols)
 	cols[is.na(m)] <- NA
 
-	gImage(cols, xlab="Antecedent (lhs)", ylab="Consequent (rhs)", 
+	gImage(cols, xlab="Antecedent (LHS)", ylab="Consequent (RHS)", 
 		name="image")
 
 	upViewport(1)
@@ -165,9 +165,9 @@ matrix_int2 <- function(rules, measure, control, ...){
 
     }
 
-    writeLines("Itemsets in Antecedent (lhs)")
+    writeLines("Itemsets in Antecedent (LHS)")
     print(colnames(m1))
-    writeLines("Itemsets in Consequent (rhs)")
+    writeLines("Itemsets in Consequent (RHS)")
     print(rownames(m1))
 
     ## start plot
@@ -199,7 +199,7 @@ matrix_int2 <- function(rules, measure, control, ...){
 	    ncol=ncol(m1))
     cols[is.na(m1) | is.na(m2)] <- NA
 
-    gImage(cols, xlab="Antecedent (lhs)", ylab="Consequent (rhs)",
+    gImage(cols, xlab="Antecedent (LHS)", ylab="Consequent (RHS)",
 	    name="image")
     
     upViewport(1)

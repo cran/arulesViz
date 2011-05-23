@@ -90,7 +90,15 @@ used for reordering (see \code{seriation()} method in \pkg{seriation}).
 
 \emph{grouped}
 Grouped matrix-based visualization. Antecedents (columns) in the matrix are
-grouped using clustering. 
+grouped using clustering. Groups are represented as balloons
+in the matrix.
+The list of control parameters for this method is
+"main", "k" (number of groups), "aggr.fun". 
+The aggregation function
+can be any function computing a scalar from a vector 
+(e.g., min, mean, median (default), sum, max). It is also used 
+to reorder the balloons in the plot.
+
 Interactive manipulations are available. 
 
 \emph{graph}
@@ -103,8 +111,8 @@ Control arguments are "main",
 "nodeLabels" (\code{TRUE} - use item/itemset names instread of ids),
 "edgeLabels" (\code{FALSE} - plot values of interest measures),
 "precision" (for plotting measures),
-"layout" (use a different graphviz layout, e.g., dot, neato, fdp, circo),
-
+"layout" (use a different graphviz layout, e.g., dot, neato, fdp, circo).
+Note: package Rgraphviz is required.
 %% itemsets missing
 
 \emph{doubledecker, mosaic}

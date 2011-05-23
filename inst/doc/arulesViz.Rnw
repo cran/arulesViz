@@ -43,7 +43,7 @@
 %% an abstract and keywords
 \Abstract{
 Association rule mining is a popular data mining method available in R as the
-extension package~\pkg{arules}.  However, mining association rule often results
+extension package~\pkg{arules}.  However, mining association rules often results
 in a very large number of found rules, leaving the analyst with the task to go
 through all the rules and discover interesting ones. Sifting manually through
 large sets of rules is time consuming and strenuous. Visualization has a long
@@ -435,16 +435,17 @@ antecedent/consequent combination the intersection area is left blank.
 Formally, the visualized matrix is constructed as follows.
 We start with the set of association rules 
 $$\set{R} = \{
-    \langle a_1,c_1,m_1\rangle, 
-    \langle a_2,c_2,m_2\rangle, \ldots 
+    \langle a_1,c_1,m_1\rangle, \ldots
+    \langle a_i,c_i,m_i\rangle, \ldots 
     \langle a_n,c_n,m_n\rangle\}$$
 where $a_i$ is the antecedent, $c_i$ is the consequent and $m_i$ is the 
 selected interest measure
-for the $i$-th rule.  In $\set{R}$ we identify the set of $K$ unique
-antecedents and $L$ unique consequent We create a $L \times K$ matrix
+for the $i$-th rule for $i = 1,\ldots,n$.  
+    In $\set{R}$ we identify the set of $K$ unique
+antecedents and $L$ unique consequent. We create a $L \times K$ matrix
 $\mat{M}$ with one column for each unique antecedent and one row for each
 unique consequent.  Finally, we populate the matrix by setting
-$\mat{M}_{lk} = m_i$ for $i=\{1,2,\ldots,n\}$ and $l$ and $k$ corresponding
+$\mat{M}_{lk} = m_i$ for $i=1,\ldots,n$ and $l$ and $k$ corresponding
 to the position of $a_i$ and $c_i$ in the matrix.
 Note that $\mat{M}$ will contain many empty cells since 
 many potential association rules
@@ -666,10 +667,10 @@ divided by the number of unique items in both sets.  For a set of $m$ rules we
 can calculate the $m(m-1)/2$ distances and use them as the input for
 clustering.  However, using clustering on the itemsets directly has several
 problems. First of all, data sets typically mined for association rules are
-high-dimensional, i.e., contain many different items. This high-dimensionality
+high-dimensional, i.e., contain many different items. This high dimensionality
 is carried over to the mined rules and leads to a situation referred is as the
 ``course of dimensionality'' where, due to the exponentially increasing volume,
-distance functions lose their usefulness. The situation is even getting worse
+distance functions lose their usefulness. The situation is getting worse
 since minimum support used in association rule mining leads in addition to
 relatively short rules resulting in extremely sparse data.
 
@@ -682,7 +683,7 @@ Using common covered
 transactions avoids the problems of clustering sparse, high-dimensional binary
 vectors. However, it introduces a strong bias towards clustering rules which
 are generated from the same frequent itemset.  By definition of frequent
-itemsets, two subsets of a frequent itemset will both cover many common
+itemsets, two subsets of a frequent itemset will cover many common
 transactions.  This bias will lead to mostly just rediscovering the already
 known frequent itemset structure from the set of association rules.
 %Yan 2005 suggests KL-divergence as distance between patterns.
@@ -852,10 +853,9 @@ as a Graphviz dot-file~\citep{arules:Gentry:2010}
 to be explored in tools like Gephi. For example the
 1000 rules with the highest lift are exported by:
 
-%\marginpar{this code needs to be adapted and we need to replace the figure with a screenshot. Probably we need to rewrite the export code, too!}
-
 <<eval=FALSE>>=
 saveDot(head(sort(rules, by="lift"),1000), file="rules.dot")
+#saveGraphML(head(sort(rules, by="lift"),1000), file="rules.graphml")
 @
 
 Figure~\ref{fig:gephi} shows a screenshot of exploring these rules
@@ -880,8 +880,8 @@ connecting the values for each
 dimension. 
 %%% MFH: what does the following mean?
 Parallel coordinates plots were used previously to visualize
-discovered classification rules \cite{arulesViz:cviz} 
-and association rules \cite{arulesViz:Yang:2003}. \cite{arulesViz:Yang:2003} 
+discovered classification rules \citep{arulesViz:cviz} 
+and association rules \citep{arulesViz:Yang:2003}. \cite{arulesViz:Yang:2003} 
 displays the items on the y-axis as nominal values and the x-axis represents
 the positions in a rule, i.e., first item, second item, etc.  Instead of a
 simple line an arrow is used where the head points to the consequent item.

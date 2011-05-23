@@ -37,7 +37,7 @@ plot.rules <- function(x, method = NULL, measure = "support",
 	scatterplot_arules(x, measure = measure, 
 		shading = shading, control)
     }
-    else if (methodNr == 7) clusterplot_arules(x, measure= measure, 
+    else if (methodNr == 7) grouped_matrix_arules(x, measure= measure, 
 		shading = shading, control=control, ...)
     else if (methodNr == 8) scatterplot_arules(x, 
 		measure = c("support", "confidence"), shading = "order", 
