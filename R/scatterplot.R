@@ -1,4 +1,4 @@
-scatterplot_arules <- function(rules, measures = c("support","confidence"), 
+scatterplot_arules <- function(rules, measure = c("support","confidence"), 
 	shading = "lift", control = NULL, ...){
 
     control <- .get_parameters(list(
@@ -21,7 +21,7 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 	    order=size(rules))
     
     ## call workhorse
-    scatterplot_int(rules, measures, shading, control, ...)
+    scatterplot_int(rules, measure, shading, control, ...)
     
     if(!control$interactive) return(invisible())
 
@@ -36,7 +36,7 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 		    row.names = c("inspect", "filter","zoom in", "zoom out", "end"),
 		    active = rep(FALSE, 5),
 		    x = c(0.1, 0.3, 0.5, 0.7, 0.9),
-		    y = I(rep(unit(-3, "lines"), 5)),
+		    y = I(rep(unit(-4.5, "lines"), 5)),
 		    w = I(rep(unit(3.5, "lines"), 5)),
 		    h = I(rep(unit(1, "lines"), 5))
 		    )
@@ -44,7 +44,7 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 
     drawButtons(gI)
 
-    q <- quality(rules)[, c(measures[1], measures[2])]
+    q <- quality(rules)[, c(measure[1], measure[2])]
     sel_r <- rules
     
     while(TRUE){
@@ -80,12 +80,12 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 		    if(is.null(control$xlim)) control$xlim <- range(q[,1])
 		    if(is.null(control$ylim)) control$ylim <- range(q[,2])
 
-		    ret <- scatterplot_arules(sel_r, measures, 
+		    ret <- scatterplot_arules(sel_r, measure, 
 			    shading, control)
 		    if(!identical(ret, "zoom out")) return(ret)
 
 		    ## replot and reset
-		    scatterplot_int(rules, measures, shading, control, ...)
+		    scatterplot_int(rules, measure, shading, control, ...)
 		    downViewport("scatterplot")
 		    gI <- resetButtons(gI)
 		    #drawButton(gI)
@@ -125,12 +125,12 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 	    control$xlim <- NULL
 	    control$ylim <- NULL
 
-	    ret <- scatterplot_arules(sel_r, measures, 
+	    ret <- scatterplot_arules(sel_r, measure, 
 		    shading, control)
 	    if(!identical(ret, "zoom out")) return(ret)
 
 	    ## replot and reset
-	    scatterplot_int(rules, measures, shading, control, ...)
+	    scatterplot_int(rules, measure, shading, control, ...)
 	    downViewport("scatterplot")
 
 	    gI <- resetButtons(gI)
@@ -164,7 +164,7 @@ scatterplot_arules <- function(rules, measures = c("support","confidence"),
 
 
 
-scatterplot_int <- function(rules, measures, shading, control, ...){
+scatterplot_int <- function(rules, measure, shading, control, ...){
 
     q <- quality(rules)
     
@@ -230,7 +230,7 @@ scatterplot_int <- function(rules, measures, shading, control, ...){
 		    width=unit(1,"npc")-unit(4+2+3+2, "lines"),
 		    just = c("left", "bottom")))
     
-    x <- q[, c(measures[1], measures[2])]
+    x <- q[, c(measure[1], measure[2])]
     
     if(control$jitter >0) {
 	x[,1] <- jitter(x[,1], factor=control$jitter)
@@ -251,7 +251,7 @@ scatterplot_int <- function(rules, measures, shading, control, ...){
 
     gScatterplot(x, 
 	    xlim=control$xlim, ylim=control$ylim, 
-	    xlab=measures[1], ylab=measures[2],
+	    xlab=measure[1], ylab=measure[2],
 	    col=col, cex=control$cex, alpha=control$alpha, pch=control$pch,
 	    name="scatterplot", new=FALSE)
 

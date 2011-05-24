@@ -15,6 +15,9 @@ black_hcl <- function(alpha=1) {
 graph_arules <- function(rules, measure = "support", shading = "lift", 
 	control=NULL, ...) {
 
+    ## load Rgraphviz
+    if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
+
     control <- .get_parameters(list(
 		    main =paste("Graph for", length(rules), "rules"),
 		    nodeColors = .nodeColors(control$alpha),
@@ -95,9 +98,9 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 	    nAttrs <- makeNodeAttrs(graph, 
 		    fillcolor = control$nodeColors[nodeType],
 		    shape = "circle")
-	    writeLines("Itemsets in Antecedent (lhs)")
+	    writeLines("Itemsets in Antecedent (LHS)")
 	    print(levels(leftHandSide))
-	    writeLines("Itemsets in Consequent (rhs)")
+	    writeLines("Itemsets in Consequent (RHS)")
 	    print(levels(rightHandSide))
 	}
 
@@ -324,6 +327,9 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 
 graph_arules_is <- function(itemsets, measure = "support", shading = NULL, 
 	control=NULL, ...) {
+
+    ## load Rgraphviz
+    if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
     control <- .get_parameters(list(
 		    main =paste("Graph for", length(itemsets), "itemsets"),

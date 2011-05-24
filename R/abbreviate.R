@@ -1,3 +1,9 @@
+## FIXME: abbreviate destroys appreviate in base!
+
+## Make abbrevate generic
+abbreviate <- function(...) UseMethod("abbreviate")
+abbreviate.default <- function(...) base::abbreviate(...)
+
 abbreviate.transactions <- function(data, minlength = 4, ..., 
         method = "both.sides"){
     
@@ -47,6 +53,3 @@ abbreviate.itemsets <- function(data, minlength = 4, ...,
 }
 
 
-## Make abbrevate generic
-abbreviate.default <- abbreviate
-abbreviate <- function(...) UseMethod("abbreviate")
