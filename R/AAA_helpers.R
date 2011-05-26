@@ -1,5 +1,9 @@
 .get_parameters <- function(p, parameter) {
     if(!is.null(parameter) && length(parameter) != 0) {
+	
+	# get rid of NULL enties
+	parameter[sapply(parameter, is.null)] <- NULL
+	
 	o <- pmatch(names(parameter), names(p))
 
 	if(any(is.na(o)))
