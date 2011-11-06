@@ -1,0 +1,3 @@
+arulesViz 0.1-4
+
+* fixed font family for igraph under windows (is now Arial).

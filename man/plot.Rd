@@ -3,9 +3,7 @@
 \alias{plot}
 \alias{plot.itemsets}
 \alias{plot.rules}
-\title{
-Plot method to visualize association rules and itemsets.
-}
+\title{Plot method to visualize association rules and itemsets}
 \description{
 This is the S3 method to visualize association rules and itemsets.
 Implemented are several popular visualization methods 
@@ -130,14 +128,21 @@ Control arguments are
 \item{"measureLabels"}{display values of interest measures (\code{FALSE})}
 \item{"precision"}{ number of digits for numbers in plot.}
 \item{"type"}{plot type: "items" or "itemsets"}
-\item{"layout"}{layout algorithm defined in \pkg{igraph}
-    (default: layout.fruchterman.reingold)}
+\item{"engine"}{graph layout engine: "igraph" (default) or "graphviz"}
+\item{"layout"}{layout algorithm defined in \pkg{igraph} or \pkg{Rgraphviz}
+    (default: layout.fruchterman.reingold for engine igraph and "dot"/"neato" for graphviz)}
 \item{"arrowSize"}{[0,1]}
 \item{"alpha"}{ alpha transparency value (default .8; set to 1 for no transparency)}
 }
 
-The used plot function is \code{plot} in \pkg{igraph}. For the
-interactive version \code{tkplot} in \pkg{igraph} is used.
+For the igraph engine the used plot function is \code{plot.igraph} 
+in \pkg{igraph}. 
+For graphviz the function \code{plot} in
+\pkg{Rgraphviz} is used. Note that Rgraphviz is available at 
+\url{http://www.bioconductor.org/}.
+For the
+interactive version \code{tkplot} in \pkg{igraph} is always used.
+
 \code{...} arguments are passed on to the respective plotting function.
 }
 
@@ -239,6 +244,7 @@ plot(subrules2, method="graph")
 plot(subrules2, method="graph", 
 	control=list(type="items"))
 ## try: plot(subrules2, method="graph", interactive=TRUE)
+## try: plot(subrules2, method="graph", control=list(engine="graphviz", type="items"))
 
 
 ## parallel coordinates plot
