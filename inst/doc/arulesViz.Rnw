@@ -791,10 +791,14 @@ subrules2 <- head(sort(rules, by="lift"), 10)
 @
 
 \pkg{arulesViz} contains several graph-based visualizations
-rendered using the interface to the \emph{GraphViz} software in 
+rendered using 
+either the \emph{igraph} library via package 
+\pkg{igraph}~\citep{arulesViz:Csardi2006, }
+or
+the interface to the \emph{GraphViz} software in 
 package \pkg{Rgraphviz}~\citep{arules:Gentry:2010}. 
-The default
-version represents itemsets as vertices and rules as directed edges
+By default igraph is used. The following
+plot represents itemsets as vertices and rules as directed edges
 between itemsets (shown in Figure~\ref{fig:graph1}).
 
 <<graph1, fig=TRUE, width=10, height=10, include=FALSE>>=
@@ -828,15 +832,17 @@ Figure~\ref{fig:graph3} shows the resulting graph.
 This representation focuses on how the rules are composed of individual items
 and shows which rules share items.
 
-The built-in graph based visualizations available in \pkg{arulesViz} are only
+An interactive visualization is available in \pkg{arulesViz},
+however,
+the built-in graph based visualizations are only
 useful for small set of rules.  To explore large sets of rules with graphs,
 advanced interactive features like zooming, filtering, grouping and coloring
 nodes are needed. Such features are available in interactive visualization 
 and exploration platforms for 
 networks and graphs like \emph{Gephi}~\citep{arules:Bastian:2009}.
 From \pkg{arulesViz} graphs for sets of association rules can be exported
-as a Graphviz dot-file~\citep{arules:Gentry:2010}
-or in the GraphML format
+in the GraphML format
+or as a Graphviz dot-file
 to be explored in tools like Gephi. For example the
 1000 rules with the highest lift are exported by:
 
