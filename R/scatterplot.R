@@ -29,7 +29,8 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
 		    ylim = NULL,
 		    zlim = NULL,
 		    alpha = NULL,
-		    gray_range = c(.1,.8),
+		    col = hcl(c=0, l=seq(10,80, length.out=100)),
+		    #gray_range = c(.1,.8),
 		    newpage = TRUE,
 		    jitter = 0
 		    ), control)
@@ -185,6 +186,11 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
 
 scatterplot_int <- function(rules, measure, shading, control, ...){
 
+
+    ## reverse colors
+    colors <- rev(control$col)
+
+
     q <- quality(rules)
     
     if(control$newpage) grid.newpage()
@@ -213,10 +219,11 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
 	    min_size <- min(q$order)
 	    steps <- (max_size-min_size)+1
 	    ypos <- rev((1:steps -.5)/steps)
-	    col <- gray(map(min_size:max_size, control$gray_range))
+	    #col <- gray(map(min_size:max_size, control$gray_range))
+	    col <- colors[map_int(min_size:max_size, c(1,length(colors)))]
 	    grid.points(x=rep(0,steps), 
 		    y=ypos, pch=control$pch, 
-		    gp=gpar(col=col, fill=col, alpha=control$alpha), size=unit(.5,"npc"))
+		    gp=gpar(col=NA, fill=rev(col), alpha=control$alpha), size=unit(.5,"npc"))
 	    grid.text(paste("order", max_size:min_size, sep=" "), 
 		    x=rep(1,steps), y=ypos)
 	
@@ -225,7 +232,8 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
 		if(diff(range_shading) != 0) {
 
 		    gColorkey(range_shading,
-			    gray(1-map(1:20, control$gray_range)),
+			    colors,
+			    #gray(1-map(1:20, control$gray_range)),
 			    name="colorkey", label=shading)
 		}else{
 		    grid.text(paste(shading, "=", 
@@ -259,12 +267,13 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
 
     ## get colors for shading
     if(!is.na(shading)) {
-	col <- 1-map(q[[shading]], 
-		control$gray_range, from.range=range_shading)
+	#col <- 1-map(q[[shading]], 
+	#	control$gray_range, from.range=range_shading)
+	    col <- colors[map_int(q[[shading]], c(1,length(colors)), from.range=range_shading)]
 	## not in range!
-	x[is.na(col),] <- c(NA,NA) 
-	col[is.na(col)] <- 1
-	col <- gray(col)
+	    #x[is.na(col),] <- c(NA,NA) 
+	    #col[is.na(col)] <- 1
+	    #col <- gray(col)
 
     }else col <- 1
 

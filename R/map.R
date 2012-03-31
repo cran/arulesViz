@@ -41,3 +41,7 @@ map <- function(x, range = c(0,1), from.range=NA) {
     x
 }
 
+
+map_int <- function(x, range = c(1,100), from.range=NA) {
+    floor(map(x, c(range[1], range[2]+.9), from.range))
+}
