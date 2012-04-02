@@ -29,6 +29,7 @@ grouped_matrix_arules <- function(rules, measure, shading, control=NULL, ...){
 		    ## fix lift so serveral plots are comparable (NA: take max)
 		    max.shading=NA,
 		    interactive = FALSE,
+		    col = hcl(c=0, l=seq(10,80, length.out=100)),
 		    newpage=TRUE
 		    ), control)
 
@@ -36,7 +37,8 @@ grouped_matrix_arules <- function(rules, measure, shading, control=NULL, ...){
     x <- grouped_matrix_int(rules, measure, shading,
 	    k=control$k, 
 	    aggr.fun=control$aggr.fun, 
-	    max.shading=control$max.shading 
+	    max.shading=control$max.shading,
+	    col=control$col
 	    )
 
     if(!control$interactive) return(invisible(x))
@@ -147,7 +149,8 @@ rowMaxs <- function(x, na.rm=FALSE) apply(x, MARGIN=1, max, na.rm=na.rm)
 
 ## create an grouped_matrix
 grouped_matrix_int <- function(rules, measure, shading,
-	k=15, aggr.fun=median, max.shading=NA) {
+	k=15, aggr.fun=median, max.shading=NA, 
+	col=hcl(c=0, l=seq(10,80, length.out=100))) {
 
     ## check k
     if(length(unique(lhs(rules)))< k) k <- length(unique(lhs(rules)))
@@ -190,13 +193,13 @@ grouped_matrix_int <- function(rules, measure, shading,
     class(ret) <- "grouped_matrix"
 
     ## call plotting work horse
-    plot(ret)
+    plot(ret, col=col)
 
     ret
 }
 
 ## display grouped_matrix
-plot.grouped_matrix <- function(x) {
+plot.grouped_matrix <- function(x, col = hcl(c=0, l=seq(10,80, length.out=100))) {
     ## circle size
     sn <- x$mAggr
     ## shading
@@ -221,7 +224,8 @@ plot.grouped_matrix <- function(x) {
 			    table(x$cl),
 			    paste('(',most_imp_item, ')', sep='')),
 		    main = paste("Grouped matrix for", length(x$rules), "rules"),
-		    legend = paste("size:",x$measure, "\ncolor:",x$shading)
+		    legend = paste("size:",x$measure, "\ncolor:",x$shading),
+		    col = col
 		    )
 	    )
 }
@@ -239,7 +243,7 @@ grouped_matrix_plot_int <- function (x, y, order = NULL, options = NULL) {
     	stop("Argument 'x' must be a matrix.")
 
     options <- .get_parameters(list(
-		    panel.function = panel.bars, 
+		    panel.function = panel.circles, 
 		    reverse = FALSE, 
 		    xlab = NULL, 
 		    ylab = NULL, 
@@ -249,6 +253,7 @@ grouped_matrix_plot_int <- function (x, y, order = NULL, options = NULL) {
 		    gp_panels = gpar(), 
 		    newpage = TRUE,
 		    main = "Grouped matrix",
+		    col = hcl(c=0, l=seq(10,80, length.out=100)),
 		    legend = ""
 		    ), options)
 	
@@ -281,6 +286,11 @@ grouped_matrix_plot_int <- function (x, y, order = NULL, options = NULL) {
 	    x=unit(1, "npc")-unit(1,"lines"),
 	    y=unit(-2, "lines"),
 	    just=c("right", "top"), gp=options$gp_labels)
+    
+    ### FIXME: a color and size key would be great!
+    #gColorkey(c(0,1), options$col, label = "FIXME",
+    # 	            name = "colorkey", gp = gpar())
+    
     upViewport(1)
 
     ## determine margins
@@ -312,10 +322,13 @@ grouped_matrix_plot_int <- function (x, y, order = NULL, options = NULL) {
     for (variable in 1:ncol(x)) {
 	size <- x[, variable]
 	shading <- y[, variable]
+	shading <- options$col[map_int(shading, c(1, length(options$col)), from.range=c(0,1))]
+
 
 	options$panel.function(ncol(x)-variable+1L, size, 
 		shading, options$spacing)
     }
+    
 
     ## labels
     yLabPos <- yLabPos + unit(1, "lines")
@@ -359,7 +372,7 @@ panel.circles <- function (row, size, shading, spacing)
 
     grid.circle(x = c(1:length(size)), y=row, r = size/2 * (1 - spacing), 
 	    default.units = "native", 
-	    gp = gpar(fill = gray(shading), alpha=.9))
+	    gp = gpar(fill = shading, alpha=.9))
 }
 
 panel.squares <- function (row, size, shading, spacing) 
@@ -369,7 +382,7 @@ panel.squares <- function (row, size, shading, spacing)
     grid.rect(x = c(1:length(size)), y=row, width = size * (1 - spacing), 
 	    height = size * (1 - spacing), 
 	    default.units = "native", 
-	    gp = gpar(fill = gray(shading), alpha=.9))
+	    gp = gpar(fill = shading, alpha=.9))
 }
 
 

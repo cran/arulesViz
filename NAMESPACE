@@ -1,4 +1,5 @@
 import(arules)
+import(seriation)
 
 export(abbreviate, saveAsGraph)
 

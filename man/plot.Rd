@@ -68,6 +68,7 @@ The list of control parameters for this method is
 \item{"cex"}{symbol size}
 \item{"xlim","ylim"}{limits}
 \item{"jitter"}{a number greater than 0 adds jitter to the points}
+\item{"col"}{color palette (default is 100 gray values.)}
 }
 
 Interactive manipulations are available.
@@ -112,6 +113,7 @@ The list of control parameters for this method is
 can be any function computing a scalar from a vector
 (e.g., min, mean, median (default), sum, max). It is also used
 to reorder the balloons in the plot.}
+\item{"col"}{color palette (default is 100 gray values.)}
 }
 
 Interactive manipulations are available. 
@@ -143,7 +145,7 @@ For graphviz the function \code{plot} in
 For the
 interactive version \code{tkplot} in \pkg{igraph} is always used.
 
-\code{...} arguments are passed on to the respective plotting function.
+\code{...} arguments are passed on to the respective plotting function (use for color, etc.).
 }
 
 \item{"doubledecker", "mosaic"}{

@@ -217,7 +217,7 @@ sets of values of a selected interest measure.
 The rest of the paper is organized as follows.
 In Section~\ref{sec:prep} we give a very short example
 of how to prepare data using package~\pkg{arules} and then introduce
-the unified interface provided by ~\pkg{arulesViz} for association
+the unified interface provided by~\pkg{arulesViz} for association
 rule visualization.
 In Sections~\ref{sec:scatter} to \ref{sec:doubledecker} we describe
 the different visualization techniques and give examples.
@@ -228,7 +228,7 @@ In Section~\ref{sec:comp} compares the presented visualization techniques.
 Section~\ref{sec:conclusion} concludes the paper.
 
 
-\section{Data preparation and unified interface of \pkg{arulesViz}}
+\section{Data preparation and unified interface of arulesViz}
 \label{sec:prep}
 
 To use \pkg{arulesViz} we fist have to load the package. 
