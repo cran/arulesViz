@@ -1,5 +1,8 @@
 import(arules)
-import(seriation)
+import(igraph)
+importFrom(seriation, seriate, ser_permutation, set_seriation_method)
+importFrom(scatterplot3d, scatterplot3d)
+importFrom(vcd, mosaic)
 
 export(abbreviate, saveAsGraph)
 
