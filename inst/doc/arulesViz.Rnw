@@ -59,11 +59,11 @@ With examples we show how these visualization techniques can be used to analyze 
 
 \Address{
     Michael Hahsler\\
-    Computer Science and Engineering\\
+    Engineering Management, Information, and Systems\\
     Lyle School of Engineering\\
     Southern Methodist University\\
-    P.O. Box 750122 \\
-    Dallas, TX 75275-0122\\
+    P.O. Box 750123 \\
+    Dallas, TX 75275-0123\\
     E-mail: \email{mhahsler@lyle.smu.edu}\\
     URL: \url{http://lyle.smu.edu/~mhahsler}
 }

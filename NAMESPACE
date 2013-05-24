@@ -5,6 +5,7 @@ export(abbreviate, saveAsGraph)
 
 S3method(plot, rules)
 S3method(plot, itemsets)
+S3method(plot, grouped_matrix)
 S3method(abbreviate, default)
 S3method(abbreviate, transactions)
 S3method(abbreviate, rules)

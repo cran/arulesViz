@@ -1,0 +1,12 @@
+Changes in version 0.1-7
+    * plot checks now if 0 rules/itemsets are used
+    * scatterplots with a single rule now display correctly
+
+Changes in version 0.1-6
+    * plot method matrix does not accept custom colors 
+
+Changes in version 0.1-5
+    * fixed namespace (imports seriation now)
+
+Changes in version 0.1-4
+    * fixed font family for igraph under windows (is now Arial).
