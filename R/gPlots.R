@@ -104,6 +104,10 @@ gScatterplot <- function(x, y=NULL, xlim = NULL, ylim = NULL,
     if(is.null(ylim)) ylim <- range(y, na.rm=TRUE)
     else y[y<ylim[1] | y>ylim[2]] <- NA
 
+    ## handle a single vaule for lim
+    if(diff(xlim)==0) xlim <- xlim*c(0.5, 1.5)
+    if(diff(ylim)==0) ylim <- ylim*c(0.5, 1.5)
+    
     ## make plotting region 5% larger
     width <- diff(xlim)
     height <- diff(ylim)

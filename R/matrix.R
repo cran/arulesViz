@@ -20,7 +20,7 @@ matrix_arules <- function(rules, measure = "support", control = NULL, ...){
 
     control <- .get_parameters(list(
 		    main = paste("Matrix with",length(rules),"rules"),
-		    col = gray.colors(100, 0, 1),
+		    col = gray.colors(100, 0.3, .8),
 		    reorder = FALSE,
 		    reorderBy = NULL,
 		    reorderMethod = "TSP",
@@ -132,9 +132,9 @@ matrix_int <- function(rules, measure, control, ...){
 			width=unit(1,"npc")-unit(4+2+2+3, "lines"),
 			just = c("left", "bottom")))
 
-	cols <- map(m, c(.8,.1))
-	cols[is.na(cols)] <- 1
-	cols[] <- gray(cols)
+  cols <- matrix(NA, nrow=nrow(m), ncol=ncol(m))
+  cols[] <- control$col[map(m, c(1,(length(control$col)+1)))]
+	cols[is.na(cols)] <- control$col[length(control$col)]
 	cols[is.na(m)] <- NA
 
 	gImage(cols, xlab="Antecedent (LHS)", ylab="Consequent (RHS)", 
@@ -151,8 +151,7 @@ matrix_int <- function(rules, measure, control, ...){
 			#just = c("left", "bottom")))
 			just = c("left", "top")))
 	
-	gColorkey(range(m, na.rm=TRUE), gray(map(1:20, c(.8,.1))),
-		label = measure[1])
+	gColorkey(range(m, na.rm=TRUE), control$col, label = measure[1])
    
 	upViewport(1)
     }

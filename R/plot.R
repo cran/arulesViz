@@ -32,6 +32,8 @@ plot.rules <- function(x, method = NULL, measure = "support",
 	    "iplots"
             )
 
+    if(length(x)<1) stop("x contains 0 rules!")
+
     if(is.null(method)) methodNr <- 6
     else methodNr <- pmatch(tolower(method), tolower(methods))
         if(is.na(methodNr)) stop (paste("Unknown method:",sQuote(method)))
@@ -74,6 +76,8 @@ plot.itemsets <- function(x, method = NULL, measure = "support", interactive=FAL
 	    "graph",
 	    "paracoord"
             )
+    
+    if(length(x)<1) stop("x contains 0 itemsets!")
 
     if(is.null(method)) methodNr <- 1
     else methodNr <- pmatch(tolower(method), tolower(methods))

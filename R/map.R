@@ -22,10 +22,17 @@ map <- function(x, range = c(0,1), from.range=NA) {
     if(any(is.na(from.range))) from.range <- range(x, na.rm=TRUE)
     
     ## check if all values are the same
-    if(!diff(from.range)) return(
-	    matrix(mean(range), ncol=ncol(x), nrow=nrow(x), 
-		    dimnames = dimnames(x)))
-    
+    if(!diff(from.range)) { 
+	if(is.matrix(x))
+	    return(
+		matrix(mean(range), ncol=ncol(x), nrow=nrow(x), 
+			dimnames = dimnames(x)))
+	else return(
+		    structure(rep(mean(range), length(x)), names=names(x))
+		)
+
+	}
+
     ## map to [0,1]
     x <- (x-from.range[1])
     x <- x/diff(from.range)

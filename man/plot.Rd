@@ -3,6 +3,7 @@
 \alias{plot}
 \alias{plot.itemsets}
 \alias{plot.rules}
+\alias{plot.grouped_matrix}
 \title{Plot method to visualize association rules and itemsets}
 \description{
 This is the S3 method to visualize association rules and itemsets.
@@ -233,7 +234,8 @@ plot(subrules, method="matrix", measure=c("lift", "confidence"))
 plot(subrules, method="matrix", measure=c("lift", "confidence"), 
 	control=list(reorder=TRUE))
 
-## try: plot(subrules, method="matrix", measure="lift", interactive=TRUE, control=list(reorder=TRUE))
+## try: plot(subrules, method="matrix", measure="lift", interactive=TRUE, 
+##		control=list(reorder=TRUE))
 
 ## grouped matrix plot
 plot(rules, method="grouped")
@@ -246,7 +248,8 @@ plot(subrules2, method="graph")
 plot(subrules2, method="graph", 
 	control=list(type="items"))
 ## try: plot(subrules2, method="graph", interactive=TRUE)
-## try: plot(subrules2, method="graph", control=list(engine="graphviz", type="items"))
+## try: plot(subrules2, method="graph", control=list(engine="graphviz", 
+##		type="items"))
 
 
 ## parallel coordinates plot

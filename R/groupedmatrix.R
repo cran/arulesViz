@@ -199,7 +199,7 @@ grouped_matrix_int <- function(rules, measure, shading,
 }
 
 ## display grouped_matrix
-plot.grouped_matrix <- function(x, col = hcl(c=0, l=seq(10,80, length.out=100))) {
+plot.grouped_matrix <- function(x, col = hcl(c=0, l=seq(10,80, length.out=100)), ...) {
     ## circle size
     sn <- x$mAggr
     ## shading
