@@ -1,6 +1,7 @@
 Changes in version 0.1-7
     * plot checks now if 0 rules/itemsets are used
     * scatterplots with a single rule now display correctly
+    * transition from igraph0 to igraph
 
 Changes in version 0.1-6
     * plot method matrix does not accept custom colors 

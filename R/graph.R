@@ -614,7 +614,7 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 	
 	for(m in names(quality(itemsets))) {
 	    g <- set.vertex.attribute(g, m, 
-		    (1:length(itemsets))-1, value=quality(itemsets)[[m]])
+		    (1:length(itemsets)), value=quality(itemsets)[[m]])
 	}
 	
 	if(!control$plot) return(g)
