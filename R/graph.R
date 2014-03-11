@@ -254,12 +254,12 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 
 	if(!control$interactive) {
 	    if(control$engine=="graphviz") {
-		if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
+		if(!.installed("Rgraphviz")) stop ("Package Rgraphviz needed. Please install from Bioconductor!")
 
 		gNEL <- igraph.to.graphNEL(g)
 		
 		if(is.null(control$layout)) control$layout <- "neato"
-		att <-  getDefaultAttrs(layoutType = control$layout)
+		att <-  Rgraphviz::getDefaultAttrs(layoutType = control$layout)
 		#att$node$width <- .75
 		#att$node$fillcolor <- "#e0e0e0"
 		#att$node$shape <- "ellipse"
@@ -275,8 +275,8 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		    edgeLabels <- paste(paste(round(m, control$precision), 
 				    "/", round(s, control$precision)))
 		    edgeLabels <- edgeLabels[setdiff(seq(along = edgeLabels),
-			    removedEdges(gNEL))]
-		    names(edgeLabels) <- edgeNames(gNEL)
+			    Rgraphviz::removedEdges(gNEL))]
+		    names(edgeLabels) <- Rgraphviz::edgeNames(gNEL)
 		    eAttrs$label <- edgeLabels
 		    #labelfontsize <- rep("1", length(edgeNames(graph)))
 		    #names(labelfontsize) <- edgeNames(graph)
@@ -286,29 +286,29 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		## use gray value to code for measure
 		#color <- paste("grey", floor(map(m, c(80,1))), sep='')
 		if(!is.na(measure)) {
-		    lwd <- map(sapply(edgeData(gNEL), 
+		    lwd <- map(sapply(Rgraphviz::edgeData(gNEL), 
 				    FUN = function(i) i[[measure]]),
 			    c(2,5))
-		    names(lwd) <- edgeNames(gNEL)
+		    names(lwd) <- Rgraphviz::edgeNames(gNEL)
 		    eAttrs$lwd <- lwd
 		}
 
 		if(!is.na(shading)) {
-		    color <- gray_hcl(map(sapply(edgeData(gNEL), 
+		    color <- gray_hcl(map(sapply(Rgraphviz::edgeData(gNEL), 
 				    FUN = function(i) i[[shading]]),
 			    c(0.9,0.1)), alpha=control$alpha)
-		    names(color) <- edgeNames(gNEL)
+		    names(color) <- Rgraphviz::edgeNames(gNEL)
 		    eAttrs$color <- color
 		}
 
 
 		if(control$itemLabels) {
-		    nAttrs <- makeNodeAttrs(gNEL, 
+		    nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			    fillcolor = control$nodeColors[1], 
-			    label = levels(itemsetLabels)[as.integer(nodes(gNEL))],
+			    label = levels(itemsetLabels)[as.integer(graph::nodes(gNEL))],
 			    shape = "box", width=0.75, fixedsize=FALSE)
 		} else {
-		    nAttrs <- makeNodeAttrs(gNEL, 
+		    nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			    fillcolor = control$nodeColors[1],
 			    shape = "circle")
 
@@ -317,7 +317,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		}
 
 		## plot whines about zero length arrows
-		suppressWarnings(pl <- plot(gNEL, control$layout, 
+		suppressWarnings(pl <- Rgraphviz::plot(gNEL, control$layout, 
 				edgeAttrs = eAttrs,
 				nodeAttrs = nAttrs,
 				attrs = att,
@@ -466,12 +466,12 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 	
 	if(!control$interactive) {
 	    if(control$engine=="graphviz") {
-		if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
+		if(!.installed("Rgraphviz")) stop ("Package Rgraphviz needed!")
 		
 		gNEL <- igraph.to.graphNEL(g)
 
 		if(is.null(control$layout)) control$layout <- "dot"
-		att <-  getDefaultAttrs(layoutType = control$layout)
+		att <-  Rgraphviz::getDefaultAttrs(layoutType = control$layout)
 		att$edge$color <- black_hcl(control$alpha)
 		att$edge$len <- 2.0	# neato
 		att$graph$rankdir <- "LR" # dot
@@ -481,7 +481,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		## TODO: plot edge labels
 
 		if(control$itemLabels) {
-		    nAttrs <- makeNodeAttrs(gNEL, 
+		    nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			    fillcolor = c(rep(control$nodeColors[1], 
 					    length(itemNodes)), 
 				    gray_hcl(map(s, c(0.9,0.1)), 
@@ -492,7 +492,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 				    map(m, c(0.5,1.2))), 
 			    fixedsize=FALSE)
 		} else {
-		    nAttrs <- makeNodeAttrs(gNEL, 
+		    nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			    fillcolor = c(rep(control$nodeColors[1],
 					    length(itemNodes)),
 				    gray_hcl(map(s, c(0.9,0.1)), 
@@ -646,20 +646,20 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 
 	if(!control$interactive) {
 	    if(control$engine=="graphviz") {
-		if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
+		if(!.installed("Rgraphviz")) stop ("Package Rgraphviz needed. Please install from Bioconductor!")
 		
 		gNEL <- igraph.to.graphNEL(g)
 
 		if(is.null(control$layout)) control$layout <- "dot"
 		
-		nAttrs <- makeNodeAttrs(gNEL, 
+		nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			fillcolor = control$nodeColors[type], 
 			#    label = nodeLabels,
 			shape = c("circle","box")[type], 
 			width=c(c(map(m, c(.1,2))), rep(.75, length(items))), 
 			fixedsize=c(TRUE, FALSE)[type])
 
-		sgL <- list(list(graph = subGraph(as.character(sets), gNEL), 
+		sgL <- list(list(graph = graph::subGraph(as.character(sets), gNEL), 
 				cluster = TRUE,
 				attrs = c(rank = "sink")))
 		att <- list(graph = list(

@@ -119,7 +119,7 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
     ## plot
     leftSpace <- max(stringWidth(u))
     pushViewport(viewport(x=unit(2,"lines")+leftSpace, y=unit(4,"lines"),
-		    just <-c("left","bottom"),
+		    just = c("left","bottom"),
 		    width = unit(1, "npc")-unit(4,"lines")-leftSpace,
 		    height = unit(1, "npc")-unit(4+4,"lines"),
 		    default.units = "native", gp=control$gp_labels,
@@ -181,7 +181,7 @@ paracoord_items <- function(x, measure= "support", shading = NULL,
     ## plot
     leftSpace <- max(stringWidth(u))
     pushViewport(viewport(x=unit(2,"lines")+leftSpace, y=unit(4,"lines"),
-		    just <-c("left","bottom"),
+		    just = c("left","bottom"),
 		    width = unit(1, "npc")-unit(4,"lines")-leftSpace,
 		    height = unit(1, "npc")-unit(4+4,"lines"),
 		    default.units = "native", gp=control$gp_labels,
@@ -234,14 +234,15 @@ countCrossovers <- function(m=NULL)
 		y <- m[j,i+1]
 		o <- which(m[1:j-1,i+1] > y)
 		#print(o)
-		p <- which(m[1:j-1,i] < x)
+		# p <- which(m[1:j-1,i] < x)
 		#print(p)
 		l <- which(m[1:j-1,i] > x)
 		#print(l)
 		if(as.integer(length(o)) != 0)
 		{
 		    for(k in 1:length(o))
-		    {#print(paste(o[k],i, sep=","))
+		    {
+			#print(paste(o[k],i, sep=","))
 			if(!is.na(m[o[k],i]))
 			    if(m[o[k],i] < x)
 			{

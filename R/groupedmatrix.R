@@ -298,7 +298,7 @@ grouped_matrix_plot_int <- function (x, y, order = NULL, options = NULL) {
     rightSpace <- max(stringWidth(colnames(x)))
     
     pushViewport(viewport(x=unit(2,"lines"), y=unit(4,"lines"),
-		    just <-c("left","bottom"),
+		    just = c("left","bottom"),
 		    width = unit(1, "npc")-rightSpace-unit(3,"lines"), 
 		    height = unit(1, "npc")-topSpace-unit(4+3,"lines"),
 		    #xscale = c(1, nrow(x)), yscale = c(1, ncol(x)), 

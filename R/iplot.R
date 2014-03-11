@@ -24,15 +24,15 @@ iplot_arules <- function(rules,
 		    interactive = FALSE
 		    ), control)
 
-    if(!require("iplots")) stop ("iplots requires package 'iplots'")
+    if(!.installed("iplots")) stop("iplots requires package 'iplots'")
     
-    iplot(quality(rules)[[measure[1]]], quality(rules)[[measure[2]]],
+    iplots::iplot(quality(rules)[[measure[1]]], quality(rules)[[measure[2]]],
 	    xlab = measure[1], ylab = measure[2])
-    ihist(quality(rules)[[measure[1]]], 
+    iplots::ihist(quality(rules)[[measure[1]]], 
 	    main = paste("Histogram (", measure[1], ")", sep=''))
-    ihist(quality(rules)[[measure[2]]],
+    iplots::ihist(quality(rules)[[measure[2]]],
 	    main = paste("Histogram (", measure[2], ")", sep=''))
-    ihist(quality(rules)[[shading]],
+    iplots::ihist(quality(rules)[[shading]],
 	    main = paste("Histogram (", shading, ")", sep=''))
    
     ## parallel coordinate
@@ -74,11 +74,11 @@ iplot_arules <- function(rules,
 
 	    if(y=='x') {
 		## close all iplots
-		while(iplot.cur()) iplot.off(iplot.cur())
+		while(iplots::iplot.cur()) iplots::iplot.off(iplots::iplot.cur())
 		return(invisible(NULL))
 	    }
 
-	    sel <-  iset.selected()
+	    sel <-  iplots::iset.selected()
 	    r_sel <- rules[sel]
 
 	    if(y=='s') {
@@ -88,7 +88,7 @@ iplot_arules <- function(rules,
 
 	    if(y=='r') {
 		## close all iplots
-		while(iplot.cur()) iplot.off(iplot.cur())
+		while(iplots::iplot.cur()) iplots::iplot.off(iplots::iplot.cur())
 		return(r_sel)
 	    }
 	}

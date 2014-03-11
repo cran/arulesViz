@@ -195,10 +195,10 @@ gParacoords <- function(m, discreteNames=NULL,
     arrow_type <- arrow(angle = 15)
     
     if(is.null(discreteNames)) {
-	leftSpace <- unit(3, "lines")
+	#leftSpace <- unit(3, "lines")
 	yscale <- range(as.numeric(m), na.rm=TRUE)
     }else{ 
-	leftSpace <- max(stringWidth(discreteNames))
+	#leftSpace <- max(stringWidth(discreteNames))
 	yscale <- c(.5, length(discreteNames)+.5)
     }
     

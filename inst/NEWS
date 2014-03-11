@@ -1,5 +1,8 @@
-Changes in version 0.1-8
-    * Cleaned up dependencies (moved most to Imports)
+Changes in version 0-1.8 (3/10/2014)
+    * Cleaned up dependencies on Rgraphviz
+
+Changes in version 0.1-8 (2/18/2014)
+    * Cleaned up dependencies (moved most to imports)
 
 Changes in version 0.1-7 (8/11/2013)
     * plot checks now if 0 rules/itemsets are used

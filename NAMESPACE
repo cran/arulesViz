@@ -1,6 +1,8 @@
 import(arules)
+
 import(grid) ### have to use as depends in DESCRIPTION because of vcd
 import(igraph)
+
 importFrom(seriation, seriate, ser_permutation, set_seriation_method, 
   permute, get_order)
 importFrom(scatterplot3d, scatterplot3d)
