@@ -142,18 +142,17 @@ subrules2 <- head(sort(rules, by="lift"), 10)
 ###################################################
 ### code chunk number 23: graph1
 ###################################################
-plot(subrules2, method="graph")
+plot(subrules2, method="graph", control=list(type="items"))
 
 
 ###################################################
 ### code chunk number 24: graph3
 ###################################################
-plot(subrules2, method="graph",
-        control=list(type="items"))
+plot(subrules2, method="graph")
 
 
 ###################################################
-### code chunk number 25: arulesViz.Rnw:849-851 (eval = FALSE)
+### code chunk number 25: arulesViz.Rnw:848-850 (eval = FALSE)
 ###################################################
 ## saveAsGraph(head(sort(rules, by="lift"),1000), file="rules.graphml")
 ## #saveGraphML(head(sort(rules, by="lift"),1000), file="rules.graphml")
@@ -166,7 +165,7 @@ plot(subrules2, method="paracoord")
 
 
 ###################################################
-### code chunk number 27: arulesViz.Rnw:915-917
+### code chunk number 27: arulesViz.Rnw:914-916
 ###################################################
 ### for sampling
 set.seed(4321)
@@ -179,7 +178,7 @@ plot(subrules2, method="paracoord", control=list(reorder=TRUE))
 
 
 ###################################################
-### code chunk number 29: arulesViz.Rnw:954-956
+### code chunk number 29: arulesViz.Rnw:953-955
 ###################################################
 oneRule <- sample(rules, 1)
 inspect(oneRule)

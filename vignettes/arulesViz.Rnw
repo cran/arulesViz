@@ -802,7 +802,7 @@ plot represents itemsets as vertices and rules as directed edges
 between itemsets (shown in Figure~\ref{fig:graph1}).
 
 <<graph1, fig=TRUE, width=10, height=10, include=FALSE>>=
-plot(subrules2, method="graph")
+plot(subrules2, method="graph", control=list(type="items"))
 @
 
 \begin{figure}
@@ -813,12 +813,11 @@ plot(subrules2, method="graph")
 \end{figure}
 
 
-Another variant uses items and rules as two types of vertices and
+Another variant (the default type) uses items and rules as two types of vertices and
 edges indicate which items occur in which rule.
 
 <<graph3, fig=TRUE, width=10, height=10, include=FALSE>>=
-plot(subrules2, method="graph",
-        control=list(type="items"))
+plot(subrules2, method="graph")
 @
 
 \begin{figure}

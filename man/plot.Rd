@@ -130,7 +130,7 @@ Control arguments are
 \item{"itemLabels"}{display item/itemset names instead of ids (\code{TRUE})}
 \item{"measureLabels"}{display values of interest measures (\code{FALSE})}
 \item{"precision"}{ number of digits for numbers in plot.}
-\item{"type"}{plot type: "items" or "itemsets"}
+\item{"type"}{vertices represent: "items" (default) or "itemsets"}
 \item{"engine"}{graph layout engine: "igraph" (default) or "graphviz"}
 \item{"layout"}{layout algorithm defined in \pkg{igraph} or \pkg{Rgraphviz}
     (default: layout.fruchterman.reingold for engine igraph and "dot"/"neato" for graphviz)}
@@ -208,19 +208,25 @@ Foundation of North America.
 }
 \examples{
 data(Groceries)
-rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5))
+rules <- apriori(Groceries, parameter=list(support=0.005, confidence=0.5))
 rules
 
-## scatterplot
+## Scatterplot
 plot(rules)
 ## try: sel <- plot(rules, interactive=TRUE)
 
+## Scatterplot with custom colors
+library(colorspace) # for sequential_hcl
+plot(rules, control=list(col=sequential_hcl(100)))
+    
 ## Two-key plot is a scatterplot with shading = "order"
-plot(rules, shading="order", control=list(main = "Two-key plot"))
+plot(rules, shading="order", control=list(main = "Two-key plot", 
+  col=rainbow(5)))
 
-## the following techniques work better with fewer rules
-subrules <- rules[quality(rules)$confidence > 0.8]
-
+## The following techniques work better with fewer rules
+subrules <- subset(rules, lift>2.5)
+subrules
+  
 ## 2D matrix with shading
 plot(subrules, method="matrix", measure="lift")
 plot(subrules, method="matrix", measure="lift", control=list(reorder=TRUE))
@@ -239,17 +245,14 @@ plot(subrules, method="matrix", measure=c("lift", "confidence"),
 
 ## grouped matrix plot
 plot(rules, method="grouped")
-plot(rules, method="grouped", control=list(k=30))
 ## try: sel <- plot(rules, method="grouped", interactive=TRUE)
 
 ## graphs only work with very few rules
 subrules2 <- sample(rules, 10)
 plot(subrules2, method="graph")
-plot(subrules2, method="graph", 
-	control=list(type="items"))
+plot(subrules2, method="graph", control=list(type="itemsets"))
 ## try: plot(subrules2, method="graph", interactive=TRUE)
-## try: plot(subrules2, method="graph", control=list(engine="graphviz", 
-##		type="items"))
+## try: plot(subrules2, method="graph", control=list(engine="graphviz"))
 
 
 ## parallel coordinates plot
@@ -265,9 +268,9 @@ plot(oneRule, method="doubledecker", data = Groceries)
 
 
 ## for itemsets
-itemsets <- eclat(Groceries, parameter = list(support = 0.02))
+itemsets <- eclat(Groceries, parameter = list(support = 0.02, minlen=2))
+plot(itemsets)
 plot(itemsets, method="paracoord", control=list(alpha=.5, reorder=TRUE))
-plot(itemsets, method="graph")
 }
 \keyword{ hplot }
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

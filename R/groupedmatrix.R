@@ -208,8 +208,14 @@ plot.grouped_matrix <- function(x, col = hcl(c=0, l=seq(10,80, length.out=100)),
     ## get most important item in the lhs
     f <- lapply(split(x$rules, x$cl), FUN = function(r) itemFrequency(lhs(r)))
     most_imp_item <- lapply(f, FUN = 
-	    function(f) paste(names(which.max(f)), " +",sum(f>0)-1, 
-		    sep=""))
+	    function(x) {
+		add_items <- sum(x>0)-1
+		if(add_items>0) {
+		    paste(names(which.max(x)), ", +",sum(x>0)-1, " items", sep="")
+		}else{
+		    names(which.max(x))   
+		}
+	    })
 
     grouped_matrix_plot_int(
 	    x = map(sn, c(0.2,1)), 
@@ -221,8 +227,9 @@ plot.grouped_matrix <- function(x, col = hcl(c=0, l=seq(10,80, length.out=100)),
 		    spacing = -1, 
 		    reverse=TRUE,
 		    ylab=paste(#1:max(x$cl), "-",
-			    table(x$cl),
-			    paste('(',most_imp_item, ')', sep='')),
+			    paste('{',most_imp_item, '}', " - ",
+			    table(x$cl), " rules",
+				  sep='')),
 		    main = paste("Grouped matrix for", length(x$rules), "rules"),
 		    legend = paste("size:",x$measure, "\ncolor:",x$shading),
 		    col = col

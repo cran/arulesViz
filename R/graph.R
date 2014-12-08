@@ -25,12 +25,8 @@
 
 .font.family <- "sans"
 
-gray_hcl <- function(level, alpha=NULL) hcl(c=0, l=level*100, 
+.grey_hcl <- function(level, alpha=NULL) hcl(c=0, l=level*100, 
 	alpha=if(!is.null(alpha)) alpha else 1)
-
-black_hcl <- function(alpha=NULL) hcl(c=0, l=0, 
-	alpha=if(!is.null(alpha)) alpha else 1)
-
 
 graph_arules <- function(rules, measure = "support", shading = "lift", 
 	control=NULL, ...) {
@@ -39,13 +35,14 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		    main = paste("Graph for", length(rules), "rules"),
 		    nodeColors = .nodeColors(
 			    if(!is.null(control$alpha)) control$alpha else .8),
-			#nodeColors = c("lightgreen", "skyblue"),
+        node_hcl = .grey_hcl,
+        edge_hcl = .grey_hcl,
 		    alpha = .8,
 		    cex = 1,
 		    itemLabels = TRUE,
 		    measureLabels = FALSE,
 		    precision = 3,
-		    type = "itemsets",
+		    type = "items",
 		    layout = NULL,
 		    layoutParams = list(),
 		    arrowSize = .5,
@@ -107,11 +104,11 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 	    e.width <- map(m, c(.5,3))
 	}
 	
-	e.color <- gray_hcl(0.3, control$alpha)
+	e.color <- control$node_hcl(0.3, control$alpha)
 	s <- NA
 	if(!is.na(shading)) {
 	    s <- quality(rules)[[shading]]
-	    e.color <- gray_hcl(map(s, c(0.9,0.1)), alpha=control$alpha)
+	    e.color <- control$node_hcl(map(s, c(0.9,0.1)), alpha=control$alpha)
 	}
 
 	e.label <- NA
@@ -219,11 +216,11 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 	    e.width <- map(m, c(.5,3))
 	}
 	
-	e.color <- gray_hcl(0.3, control$alpha)
+	e.color <- control$edge_hcl(0.3, control$alpha)
 	s <- NA
 	if(!is.na(shading)) {
 	    s <- quality(rules)[[shading]]
-	    e.color <- gray_hcl(map(s, c(0.9,0.1)), alpha=control$alpha)
+	    e.color <- control$edge_hcl(map(s, c(0.9,0.1)), alpha=control$alpha)
 	}
 
 	e.label <- NA
@@ -267,7 +264,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		#att$node$fontsize <- 8.0
 		#att$edge$weight <- 4.0
 		att$edge$len <- 2.5 # neato
-		att$edge$color <- black_hcl(control$alpha)
+		att$edge$color <- control$edge_hcl(0, control$alpha)
 
 		## edges
 		eAttrs <- list()
@@ -294,7 +291,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		}
 
 		if(!is.na(shading)) {
-		    color <- gray_hcl(map(sapply(Rgraphviz::edgeData(gNEL), 
+		    color <- control$edge_hcl(map(sapply(Rgraphviz::edgeData(gNEL), 
 				    FUN = function(i) i[[shading]]),
 			    c(0.9,0.1)), alpha=control$alpha)
 		    names(color) <- Rgraphviz::edgeNames(gNEL)
@@ -421,7 +418,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 	}
 	
 	e.width <- 1
-	e.color <- gray_hcl(.6,control$alpha)
+	e.color <- control$edge_hcl(.6,control$alpha)
 	
 	m <- NA
 	if(!is.na(measure)) {
@@ -434,7 +431,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 	if(!is.na(shading)) {
 	    s <- quality(rules)[[shading]]
 	    v.color <- c(rep(control$nodeColors[1], length(itemNodes)),
-		    gray_hcl(map(s, c(0.9,0.1)), alpha=control$alpha)) 
+		    control$node_hcl(map(s, c(0.9,0.1)), alpha=control$alpha)) 
 									     
 	
 	}
@@ -472,7 +469,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 
 		if(is.null(control$layout)) control$layout <- "dot"
 		att <-  Rgraphviz::getDefaultAttrs(layoutType = control$layout)
-		att$edge$color <- black_hcl(control$alpha)
+		att$edge$color <- control$edge_hcl(0, control$alpha)
 		att$edge$len <- 2.0	# neato
 		att$graph$rankdir <- "LR" # dot
 		att$graph$ranksep <- .75 #dot
@@ -484,7 +481,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		    nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			    fillcolor = c(rep(control$nodeColors[1], 
 					    length(itemNodes)), 
-				    gray_hcl(map(s, c(0.9,0.1)), 
+				    control$node_hcl(map(s, c(0.9,0.1)), 
 					    alpha=control$alpha)), 
 			    label = nodeLabels,
 			    shape = c("box", "circle")[type], 
@@ -495,7 +492,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
 		    nAttrs <- Rgraphviz::makeNodeAttrs(gNEL, 
 			    fillcolor = c(rep(control$nodeColors[1],
 					    length(itemNodes)),
-				    gray_hcl(map(s, c(0.9,0.1)), 
+				    control$node_hcl(map(s, c(0.9,0.1)), 
 					    alpha=control$alpha)),
 			    shape = c("box", "circle")[type],
 			    width=c(rep(.75, length(itemNodes)),
@@ -566,11 +563,11 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 	control=NULL, ...) {
 
     control <- .get_parameters(list(
-		    main =paste("Graph for", length(itemsets), "itemsets"),
+		    main = paste("Graph for", length(itemsets), "itemsets"),
 		    nodeColors = .nodeColors( 
 			    if(!is.null(control$alpha)) control$alpha else .8),
-		    edgeColors = gray_hcl(.3, 
-			    if(!is.null(control$alpha)) control$alpha else .8),
+		    edgeColors = .grey_hcl(.3,
+			    alpha = if(!is.null(control$alpha)) control$alpha else .8),
 		    #itemLabels = TRUE,	    ### not implemented yet
 		    #measureLabels = FALSE,
 		    cex = 1,
@@ -580,6 +577,7 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 		    layoutParams = list(),
 		    engine = "igraph",
 		    alpha = .8,
+		    arrowSize = .5,
 		    interactive = FALSE,
 		    plot = TRUE
 		    ), control)
@@ -596,7 +594,7 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 
     if(control$type=="items") {
 	
-	sets <- as.character(1:length(itemsets))
+	sets <- paste('s', as.character(1:length(itemsets)), sep='')
 	items <- LIST(items(itemsets))
 	e.list <- cbind(unlist(items),rep(sets, size(itemsets)))
 	items <- unique(unlist(items))
@@ -632,7 +630,7 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 	    m <- quality(itemsets)[[measure]]
 	    v.size <- c(map(m, c(5,20)), 
 		    rep(15, length(items)))
-	    #v.color <- c(gray_hcl(map(m, c(0.9,0.1)), alpha=control$alpha), 
+	    #v.color <- c(control$node_hcl(map(m, c(0.9,0.1)), alpha=control$alpha), 
 	    #	    rep(NA, length(items)))
 	}
 	
@@ -703,6 +701,7 @@ graph_arules_is <- function(itemsets, measure = "support", shading = NULL,
 			edge.width=e.width,
 			edge.label=e.label,
 			edge.label.cex=control$cex*.6,
+			edge.arrow.size=control$arrowSize,
 			main=control$main
 			)
 

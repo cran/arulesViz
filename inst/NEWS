@@ -1,4 +1,8 @@
-Changes in version 0-1.8 (3/10/2014)
+Changes in version 1-0.0 (12/07/2014)
+    * Improved LHS annotation for grouped plot
+    * Version 1-0.0 release
+
+Changes in version 0-1.9 (3/10/2014)
     * Cleaned up dependencies on Rgraphviz
 
 Changes in version 0.1-8 (2/18/2014)
