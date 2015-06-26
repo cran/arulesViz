@@ -27,6 +27,7 @@ saveAsGraph(x, file, type=NULL, format="graphml")
 \seealso{
 \code{\link{plot}}, \code{\link[igraph]{write.graph}} in \pkg{igraph}
 }
+\author{Michael Hahsler}
 \examples{
 data("Groceries")
 rules <- apriori(Groceries, parameter=list(support=0.01, confidence=0.5))

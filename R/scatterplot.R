@@ -21,7 +21,7 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
 	shading = "lift", control = NULL, ...){
 
     control <- .get_parameters(list(
-		    main =paste("Scatter plot for", length(rules), "rules"),
+		    main =paste("Scatter plot for", length(rules), class(rules)),
 		    interactive = FALSE,
 		    pch = 22,
 		    cex = .5,
@@ -36,9 +36,8 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
 		    ), control)
 
 
-    ## handle order
-    if(shading=="order") quality(rules) <- cbind(quality(rules), 
-	    order=size(rules))
+    ## add order
+    quality(rules) <- cbind(quality(rules), order=size(rules))
     
     ## call workhorse
     scatterplot_int(rules, measure, shading, control, ...)

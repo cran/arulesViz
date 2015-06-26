@@ -14,7 +14,7 @@ graph based visualizations, doubledecker plots, etc.
 \usage{
 \method{plot}{rules}(x, method = NULL, measure = "support", shading = "lift", 
     interactive = FALSE, data = NULL, control = NULL, ...)
-\method{plot}{itemsets}(x, method = NULL, measure = "support", 
+\method{plot}{itemsets}(x, method = NULL, measure = "support", shading = NA,
     interactive=FALSE, data = NULL, control = NULL, ...)
 }
 \arguments{
@@ -25,7 +25,7 @@ graph based visualizations, doubledecker plots, etc.
   visualization method (see Details).}
   
   \item{measure}{ measure(s) of interestingness 
-  (e.g., "support", "confidence", "lift") used in the visualization. Some 
+  (e.g., "support", "confidence", "lift", "order") used in the visualization. Some 
   visualization methods need one measure, others take a vector with two 
   measures (e.g., scatterplot). In some plots (e.g., graphs) \code{NA} 
   can be used to suppress using a measure. }
@@ -133,7 +133,8 @@ Control arguments are
 \item{"type"}{vertices represent: "items" (default) or "itemsets"}
 \item{"engine"}{graph layout engine: "igraph" (default) or "graphviz"}
 \item{"layout"}{layout algorithm defined in \pkg{igraph} or \pkg{Rgraphviz}
-    (default: layout.fruchterman.reingold for engine igraph and "dot"/"neato" for graphviz)}
+    (default: igraph::nicely which usually does a Fruchterman-Reingold layout 
+    for engine igraph and "dot"/"neato" for graphviz)}
 \item{"arrowSize"}{[0,1]}
 \item{"alpha"}{ alpha transparency value (default .8; set to 1 for no transparency)}
 }
@@ -247,9 +248,14 @@ plot(subrules, method="matrix", measure=c("lift", "confidence"),
 plot(rules, method="grouped")
 ## try: sel <- plot(rules, method="grouped", interactive=TRUE)
 
-## graphs only work with very few rules
+## graphs only work well with very few rules
 subrules2 <- sample(rules, 10)
 plot(subrules2, method="graph")
+## igraph layout generators can be used (see ? igraph::layout_)
+plot(subrules2, method="graph", control=list(layout=igraph::in_circle()))
+plot(subrules2, method="graph", control=list(
+  layout=igraph::with_graphopt(spring.const=5, mass=50)))
+
 plot(subrules2, method="graph", control=list(type="itemsets"))
 ## try: plot(subrules2, method="graph", interactive=TRUE)
 ## try: plot(subrules2, method="graph", control=list(engine="graphviz"))
@@ -270,7 +276,13 @@ plot(oneRule, method="doubledecker", data = Groceries)
 ## for itemsets
 itemsets <- eclat(Groceries, parameter = list(support = 0.02, minlen=2))
 plot(itemsets)
+plot(itemsets, method="graph")
 plot(itemsets, method="paracoord", control=list(alpha=.5, reorder=TRUE))
+
+## add more quality measures to use for the scatterplot
+quality(itemsets) <- interestMeasure(itemsets, trans=Groceries)
+head(quality(itemsets))
+plot(itemsets, measure=c("support", "allConfidence"), shading="lift")
 }
 \keyword{ hplot }
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

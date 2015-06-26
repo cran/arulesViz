@@ -1,6 +1,13 @@
+Changes in version 1-0.1 (7/25/2015)
+    * plot (graph) now honors font family set via par(). 
+      (Bug reported by May Yang) 
+    * igraph: Updated NAMESPACE since igraph introduced functions with 
+      names that clash with arules and seriation. 
+      Transitioned to igraphs new layout mechanism. 
+    * itemsets: scatterplot is now also defaut for itemsets.
+
 Changes in version 1-0.0 (12/07/2014)
     * Improved LHS annotation for grouped plot
-    * Version 1-0.0 release
 
 Changes in version 0-1.9 (3/10/2014)
     * Cleaned up dependencies on Rgraphviz

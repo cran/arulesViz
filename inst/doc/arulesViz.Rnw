@@ -793,37 +793,38 @@ subrules2 <- head(sort(rules, by="lift"), 10)
 \pkg{arulesViz} contains several graph-based visualizations
 rendered using 
 either the \emph{igraph} library via package 
-\pkg{igraph}~\citep{arulesViz:Csardi2006, }
+\pkg{igraph}~\citep{arulesViz:Csardi2006}
 or
 the interface to the \emph{GraphViz} software in 
 package \pkg{Rgraphviz}~\citep{arules:Gentry:2010}. 
-By default igraph is used. The following
-plot represents itemsets as vertices and rules as directed edges
-between itemsets (shown in Figure~\ref{fig:graph1}).
+By default igraph is used. 
+The following
+plot represents items and rules as vertices connecting them with directed edges
+(shown in Figure~\ref{fig:graph1}).
 
 <<graph1, fig=TRUE, width=10, height=10, include=FALSE>>=
-plot(subrules2, method="graph", control=list(type="items"))
-@
-
-\begin{figure}
-\centering
-\includegraphics[width=\linewidth]{arulesViz-graph1}
-\caption{Graph-based visualization with itemsets as vertices.
-\label{fig:graph1}}
-\end{figure}
-
-
-Another variant (the default type) uses items and rules as two types of vertices and
-edges indicate which items occur in which rule.
-
-<<graph3, fig=TRUE, width=10, height=10, include=FALSE>>=
 plot(subrules2, method="graph")
 @
 
 \begin{figure}
 \centering
-\includegraphics[width=\linewidth]{arulesViz-graph3}
+\includegraphics[width=\linewidth]{arulesViz-graph1}
 \caption{Graph-based visualization with items and rules as vertices. 
+\label{fig:graph1}}
+\end{figure}
+
+
+Another variation uses itemsets as vertices and rules are represented by 
+directed edges. 
+
+<<graph3, fig=TRUE, width=10, height=10, include=FALSE>>=
+plot(subrules2, method="graph", control=list(type="itemsets"))
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{arulesViz-graph3}
+\caption{Graph-based visualization with itemsets as vertices.
 \label{fig:graph3}}
 \end{figure}
 
@@ -847,7 +848,6 @@ to be explored in tools like Gephi. For example the
 
 <<eval=FALSE>>=
 saveAsGraph(head(sort(rules, by="lift"),1000), file="rules.graphml")
-#saveGraphML(head(sort(rules, by="lift"),1000), file="rules.graphml")
 @
 
 Figure~\ref{fig:gephi} shows a screenshot of exploring these rules

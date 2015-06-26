@@ -21,7 +21,7 @@
 
 saveAsGraph <- function(x, file, type=NULL, format="graphml") {
     g <- plot(x, method="graph", control=list(plot=FALSE, type=type))
-    write.graph(g, file, format=format)
+    igraph::write.graph(g, file, format=format)
 }
 
 

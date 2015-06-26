@@ -142,20 +142,19 @@ subrules2 <- head(sort(rules, by="lift"), 10)
 ###################################################
 ### code chunk number 23: graph1
 ###################################################
-plot(subrules2, method="graph", control=list(type="items"))
+plot(subrules2, method="graph")
 
 
 ###################################################
 ### code chunk number 24: graph3
 ###################################################
-plot(subrules2, method="graph")
+plot(subrules2, method="graph", control=list(type="itemsets"))
 
 
 ###################################################
-### code chunk number 25: arulesViz.Rnw:848-850 (eval = FALSE)
+### code chunk number 25: arulesViz.Rnw:849-850 (eval = FALSE)
 ###################################################
 ## saveAsGraph(head(sort(rules, by="lift"),1000), file="rules.graphml")
-## #saveGraphML(head(sort(rules, by="lift"),1000), file="rules.graphml")
 
 
 ###################################################
