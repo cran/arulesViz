@@ -1,5 +1,5 @@
-d910eaa26089c6f027eed3fe26257ece *DESCRIPTION
-bd4952744f4e3303eeb9ea2bf1c836a7 *NAMESPACE
+31bbee7b559a1bf53303b18892bc56eb *DESCRIPTION
+89bf301631c5803ea0426b4a62795c10 *NAMESPACE
 f7243a254c3f648fdbdf8a1238925d64 *R/AAA_helpers.R
 fb63ca7c5c1e07a38299920436b70a0f *R/abbreviate.R
 37fe3d5d52b768bfb2947fe814c52f49 *R/doubledecker.R
@@ -12,13 +12,13 @@ c8cd8beaf5a36b07555893c1097acfb3 *R/iplot.R
 6ff101a6c286ce32a0acac39fb40d721 *R/matrix.R
 22f6f07d01bb509d0f1d5cfef0a32cc1 *R/paracoord.R
 c1eae7a5ed310d29e26799f55b4510af *R/plot.R
-5859fe1244daed17268d0cb33bb7b658 *R/save.R
+4723f6ffa00e4bb8f921dfc721cc44ee *R/save.R
 a8cfb6543d3a0250bca893b54de10b6f *R/scatterplot.R
 156f9abff0f69018f2404b3b038639b5 *build/vignette.rds
-ece8e1d5f7517ce809ebc2df66bf9d49 *inst/NEWS
+bc825a2c054877bad8f88ebb21e0d04f *inst/NEWS
 fcb0c315150b175df2c0262f900b8409 *inst/doc/arulesViz.R
 8bac463807ebd1907899b4fa483d5452 *inst/doc/arulesViz.Rnw
-f6634807aba6b783a171f3c0fc40d16c *inst/doc/arulesViz.pdf
+2448cba5fa6fe8a94419e212ee6a3ce0 *inst/doc/arulesViz.pdf
 3b3888dda689c1242e3ce5738756b25e *inst/n.html
 75c3205a7d4f041b790874bb2ba0420e *man/abbreviate.Rd
 de30ef71237cc3cee8aa86c56fbfed52 *man/plot.Rd

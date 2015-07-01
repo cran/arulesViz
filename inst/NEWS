@@ -1,3 +1,6 @@
+Changes in version 1-0.2 (x/xx/2015)
+    * fixed imports from non-base standard packages.
+
 Changes in version 1-0.1 (7/25/2015)
     * plot (graph) now honors font family set via par(). 
       (Bug reported by May Yang) 

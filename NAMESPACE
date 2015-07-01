@@ -1,4 +1,9 @@
 import(arules)
+importFrom(graphics, par, plot, mtext, text, axis)
+importFrom(stats, median, kmeans)
+importFrom(grDevices, hcl, rgb, gray.colors, gray)
+importFrom(methods, is, as, new)
+importFrom(utils, head, installed.packages)
 import(grid) ### need to use as depends in DESCRIPTION because of vcd
 #import(igraph) ### we use now igraph::
 importFrom(seriation, seriate, ser_permutation, set_seriation_method, 
