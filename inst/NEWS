@@ -1,5 +1,6 @@
-Changes in version 1-0.3 (x/xx/2015)
+Changes in version 1-0.3 (09/15/2015)
     * fixed empty LHS problem in grouped plot (reported by Andrew Collier)
+    * Updated for arules version 1-2.0
 
 Changes in version 1-0.2 (6/29/2015)
     * fixed imports from non-base standard packages.

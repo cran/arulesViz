@@ -47,8 +47,8 @@ rulesAsDataFrame <- function(rules, measure = "support") {
   conseqs <- labels(rhs(rules))
   
   data.frame(
-    antecedent = ordered(antes, levels = unique(antes)),
-    consequent = ordered(conseqs, level = unique(conseqs)),
+    antecedent = factor(antes, levels = unique(antes)),
+    consequent = factor(conseqs, levels = unique(conseqs)),
     measure = quality(rules)[[measure]]
   )
 }
@@ -83,9 +83,9 @@ rulesAStable <- function(rules, data) {
 }
 
 
-getTable <- function(rule, data) {
-  antecedent <- unlist(LIST(lhs(rule), decode = FALSE))
-  consequent <- unlist(LIST(rhs(rule), decode = FALSE))
+getTable <- function(rules, data) {
+  antecedent <- unlist(LIST(lhs(rules), decode = FALSE))
+  consequent <- unlist(LIST(rhs(rules), decode = FALSE))
   transactions <- data[, c(antecedent, consequent)]
   ruleAsDataFrame <- as.data.frame(as(transactions, "matrix"))
   for (i in 1:ncol(ruleAsDataFrame)) {
@@ -94,7 +94,3 @@ getTable <- function(rule, data) {
   }
   table(ruleAsDataFrame)
 }
-
-
-
-
