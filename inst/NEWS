@@ -1,7 +1,8 @@
-Changes in version 1-0.2 (x/xx/2015)
-    * fixed imports from non-base standard packages.
+Changes in version 1-0.3 (x/xx/2015)
+    * fixed empty LHS problem in grouped plot (reported by Andrew Collier)
 
-Changes in version 1-0.1 (7/25/2015)
+Changes in version 1-0.2 (6/29/2015)
+    * fixed imports from non-base standard packages.
     * plot (graph) now honors font family set via par(). 
       (Bug reported by May Yang) 
     * igraph: Updated NAMESPACE since igraph introduced functions with 

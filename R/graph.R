@@ -65,8 +65,8 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
   
   if(control$type=="bipartite") {
     ## make bipartite graph
-    leftHandSide <- as.factor(labels(lhs(rules))$elements)
-    rightHandSide <- as.factor(labels(rhs(rules))$elements)
+    leftHandSide <- as.factor(labels(lhs(rules)))
+    rightHandSide <- as.factor(labels(rhs(rules)))
     names(leftHandSide) <- paste("l",as.integer(leftHandSide),sep='')
     names(rightHandSide) <- paste("r",as.integer(rightHandSide),sep='')
     e.list <- cbind(names(leftHandSide), names(rightHandSide))
@@ -185,7 +185,7 @@ graph_arules <- function(rules, measure = "support", shading = "lift",
   } else if(control$type=="itemsets") {
     
     itemsets <- c(lhs(rules),rhs(rules))
-    itemsetLabels <- as.factor(labels(itemsets)$elements)
+    itemsetLabels <- as.factor(labels(itemsets))
     v.labels <- data.frame(
       name=1:length(levels(itemsetLabels)),
       label=levels(itemsetLabels ), 

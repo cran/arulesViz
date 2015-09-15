@@ -43,8 +43,8 @@
 
 
 rulesAsDataFrame <- function(rules, measure = "support") {
-  antes <- labels(lhs(rules))$elements
-  conseqs <- labels(rhs(rules))$elements
+  antes <- labels(lhs(rules))
+  conseqs <- labels(rhs(rules))
   
   data.frame(
     antecedent = ordered(antes, levels = unique(antes)),
