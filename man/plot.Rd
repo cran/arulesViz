@@ -93,7 +93,7 @@ closer together and make the plot clearer.}
 interest for reordering (default is the visualized measure)}
 \item{"reorderMethod","reorderControl","reorderDist"}{seriation method, control arguments and distance method (default "euclidean")
 used for reordering (see \code{seriate()} method in \pkg{seriation})}
-\item{"col"}{ a vector of n colors used for the plot (default: 100 gray values)}
+\item{"col"}{ a vector of n colors used for the plot (default: 100 heat colors)}
 \item{"xlim","ylim"}{limits}
 }
 
@@ -101,7 +101,7 @@ Currently there is no interactive version available.
 }
 
 \item{"grouped"}{
-Grouped matrix-based visualization (Hahsler and Chelloboina, 2011). 
+Grouped matrix-based visualization (Hahsler and Chelloboina, 2011; Hahsler and Karpienko, 2016). 
 Antecedents (columns) in the matrix are
 grouped using clustering. Groups are represented as balloons
 in the matrix.
@@ -114,7 +114,8 @@ The list of control parameters for this method is
 can be any function computing a scalar from a vector
 (e.g., min, mean, median (default), sum, max). It is also used
 to reorder the balloons in the plot.}
-\item{"col"}{color palette (default is 100 gray values.)}
+\item{"col"}{color palette (default is 100 heat colors.)}
+\item{"gp_labels"}{a \code{gpar()} object used for labes. Can be used to set font and font size. }
 }
 
 Interactive manipulations are available. 
@@ -196,10 +197,12 @@ Bruzzese, D. and Davino, C. (2008), Visual Mining of Association Rules, in
 Visual Data Mining: Theory, Techniques and Tools for Visual Analytics,
 Springer-Verlag, pp. 103--122.
 
-Hahsler M. and Chelluboina S. (2011), Visualizing association rules in
-hierarchical groups. In 42nd Symposium on the Interface: Statistical, Machine
-Learning, and Visualization Algorithms (Interface 2011). The Interface
-Foundation of North America.
+Hahsler, M. and Chelluboina, S. (2011), Visualizing association rules in
+hierarchical groups. Presented at the 42nd Symposium on the Interface: 
+Statistical, Machine Learning, and Visualization Algorithms 
+(Interface 2011). The Interface Foundation of North America.
+
+Hahsler, M. and Karpienko, R. (2016) Visualizing Association Rules in Hierarchical Groups. \emph{Journal of Business Economics,} accepted for publication, 2016.
 }
 
 \seealso{

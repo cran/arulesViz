@@ -1,10 +1,10 @@
 Package: arulesViz
-Version: 1.1-0
-Date: 2015-12-13
+Version: 1.1-1
+Date: 2016-04-10
 Title: Visualizing Association Rules and Frequent Itemsets
 Author: Michael Hahsler and Sudheer Chelluboina
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
-Depends: arules (>= 1.2.0), grid
+Depends: arules (>= 1.4.1), grid
 Imports: scatterplot3d, vcd, seriation, igraph (>= 1.0.0), graphics,
         methods, utils, grDevices, stats, colorspace
 Suggests: graph, Rgraphviz, iplots
@@ -14,6 +14,6 @@ URL: http://lyle.smu.edu/IDA/arules/
 BugReports: https://github.com/mhahsler/arulesViz/issues
 Copyright: (C) 2011 Michael Hahsler and Sudheer Chelluboina
 NeedsCompilation: no
-Packaged: 2015-12-13 16:57:07 UTC; hahsler
+Packaged: 2016-04-14 01:19:23 UTC; hahsler
 Repository: CRAN
-Date/Publication: 2015-12-13 19:41:02
+Date/Publication: 2016-04-14 08:32:40
