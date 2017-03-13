@@ -33,7 +33,7 @@
 %\title{Visualizing Association Rules: Introduction to the R-extension Package \pkg{arulesViz}}
 
 \author{Michael Hahsler\\Southern Methodist University \And
-	Sudheer Chelluboina\\Southern Methodist University}	    
+	Sudheer Chelluboina\\Southern Methodist University}
 \title{Visualizing Association Rules: Introduction to the R-extension Package \pkg{arulesViz}}
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Michael Hahsler, Sudheer Chelluboina} %% comma-separated
@@ -114,7 +114,7 @@ For example, a
 department store like ``Macy's'' stores customer shopping information at a
 large scale using check-out data.  Association rule mining is one of the major
 techniques to detect and extract useful information from large scale transaction
-data. Mining association rules 
+data. Mining association rules
 was fist introduced by ~\cite{arules:Agrawal+Imielinski+Swami:1993}
 and can formally be defined as:
 
@@ -128,7 +128,7 @@ is defined as an implication of the form $X \Rightarrow Y$ where $X, Y
 LHS) and \emph{consequent} (right-hand-side or RHS) of the rule.
 Often rules are restricted to only a single item in the consequent.
 
-\emph{Association rules} are rules which surpass a user-specified 
+\emph{Association rules} are rules which surpass a user-specified
 minimum support
 and minimum confidence threshold. The \emph{support}~$\mathrm{supp}(X)$ of an itemset~$X$
 is defined as the proportion of transactions in the data set which contain the
@@ -141,22 +141,22 @@ $$\mathrm{conf}(X\Rightarrow Y) \ge \delta$$
 where $\sigma$ and $\delta$ are the minimum support and minimum confidence,
 respectively.
 
-Another popular measure for association rules used throughout this paper 
-is \emph{lift}~\citep{arules:Brin+Motwani+Ullman+Tsur:1997}. 
-The lift of a rule is defined as 
-$$\mathrm{lift}(X \Rightarrow Y) = \mathrm{supp}(X\cup Y)/(\mathrm{supp}(X)\mathrm{supp}(Y))$$ 
-and can be interpreted as the deviation of the support of the whole 
-rule from the support expected under independence given the supports 
-of both sides of the rule. 
+Another popular measure for association rules used throughout this paper
+is \emph{lift}~\citep{arules:Brin+Motwani+Ullman+Tsur:1997}.
+The lift of a rule is defined as
+$$\mathrm{lift}(X \Rightarrow Y) = \mathrm{supp}(X\cup Y)/(\mathrm{supp}(X)\mathrm{supp}(Y))$$
+and can be interpreted as the deviation of the support of the whole
+rule from the support expected under independence given the supports
+of both sides of the rule.
 Greater lift values ($\gg 1$) indicate stronger associations.
 Measures like support, confidence and lift are generally called
 interest measures because they help with focusing on
 potentially more interesting rules.
 
 
-For a more detailed treatment of association rules we refer the reader to 
+For a more detailed treatment of association rules we refer the reader to
 the in introduction paper for package~\pkg{arules}
-\citep{arulesViz:Hahsler:2010, arulesViz:Hahsler:2005} 
+\citep{arulesViz:Hahsler:2010, arulesViz:Hahsler:2005}
 and the literature referred to there.
 
 Association rules are typically generated in a two-step process. First, minimum
@@ -165,13 +165,13 @@ set. Frequent itemsets are itemsets which satisfy the minimum support
 constraint. Then, in a second step, each frequent itemsets is used to generate
 all possible rules from it and all rules which do not satisfy the minimum
 confidence constraint are removed.
-Analyzing this process, it is easy to see that in 
+Analyzing this process, it is easy to see that in
 the worst case we will generate
-$2^n-n-1$ frequent itemsets 
+$2^n-n-1$ frequent itemsets
 with more than two items
 from a database with $n$ distinct items.
 %Then, if we restrict oursleves to single-item consequents, we can generate a
-%maximum of 
+%maximum of
 %$$\sum_{k=2}^{n}k\binom{n}{k} = n(2^{n-1}-1)$$
 %\marginpar{check}
 Since each frequent itemset will in the worst case generate at least two rules,
@@ -179,35 +179,35 @@ we will end up with a set of rules in the order of $O(2^n)$.
 Typically, increasing minimum support is used to keep the number of association
 rules found at a manageable size. However, this also removes potentially
 interesting rules with less support. Therefore, the need to deal with
-large sets of association rules is 
+large sets of association rules is
 unavoidable when applying association rule mining in a real setting.
 
 Visualization is successfully used to communicate both abstract and concrete
-ideas in many areas like education, engineering and 
-science~\citep{arulesViz:Prangsmal:2009}. 
-According to \cite{arulesViz:Chen:2008}, the application of visualization 
+ideas in many areas like education, engineering and
+science~\citep{arulesViz:Prangsmal:2009}.
+According to \cite{arulesViz:Chen:2008}, the application of visualization
 falls into two phases.
 First, the exploration phase where the
 analysts will use graphics that are mostly incompatible for presentation
-purposes but make it easy to find interesting and important features 
+purposes but make it easy to find interesting and important features
 of the data. The amount of interaction needed during exploration is very high
 and includes filtering, zooming and rearranging data.
 After key findings are discovered in the data, these findings must be presented
 in a way suitable for presentation for a larger audience.
-In this second phase it is important that the analyst can manipulate the 
+In this second phase it is important that the analyst can manipulate the
 presentation to clearly highlight the findings.
 
 Many researchers introduced visualization techniques
 like scatter plots, matrix visualizations, graphs, mosaic plots
-and parallel coordinates plots to analyze association rules 
-(see \cite{arulesViz:Bruzzese:2008} for a recent overview paper). 
-This paper discusses existing techniques and 
-demonstrates how their implementation in \pkg{arulesViz} 
+and parallel coordinates plots to analyze association rules
+(see \cite{arulesViz:Bruzzese:2008} for a recent overview paper).
+This paper discusses existing techniques and
+demonstrates how their implementation in \pkg{arulesViz}
 can be used via a simple unified interface.
 We extend most plots using techniques of color shading and reordering to
 improve their interpretability.
 Finally, this paper also introduces a completely new method
-called ``grouped matrix-based visualization'' which is based on a novel 
+called ``grouped matrix-based visualization'' which is based on a novel
 way of clustering rules.
 Clustering rules is usually based on distances defined on the items included
 in the rules or on shared transactions covered by the rules. However,
@@ -222,7 +222,7 @@ rule visualization.
 In Sections~\ref{sec:scatter} to \ref{sec:doubledecker} we describe
 the different visualization techniques and give examples.
 Most of the techniques are enhanced using color shading and reordering.
-Grouped matrix-based visualization in Section~\ref{sec:grouped} is 
+Grouped matrix-based visualization in Section~\ref{sec:grouped} is
 a novel visualization technique.
 In Section~\ref{sec:comp} compares the presented visualization techniques.
 Section~\ref{sec:conclusion} concludes the paper.
@@ -231,8 +231,8 @@ Section~\ref{sec:conclusion} concludes the paper.
 \section{Data preparation and unified interface of arulesViz}
 \label{sec:prep}
 
-To use \pkg{arulesViz} we fist have to load the package. 
-The package automatically loads other needed packages like 
+To use \pkg{arulesViz} we fist have to load the package.
+The package automatically loads other needed packages like
 \pkg{arules}~\citep{arulesViz:Hahsler:2010}
 for handling and mining association rules.
 For the examples in this paper we load
@@ -244,7 +244,7 @@ data("Groceries")
 @
 
 Groceries contains sales data from a local grocery store with 9835 transactions
-and 169 items (product groups). The summary shows some basic statistics of 
+and 169 items (product groups). The summary shows some basic statistics of
 the data set. For example, that the data set is rather sparse
 with a density just above 2.6\%, that
 ``whole milk'' is the most popular item and that the average transaction
@@ -262,38 +262,38 @@ rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5))
 rules
 @
 
-The result is a set of \Sexpr{length(rules)} association rules. 
+The result is a set of \Sexpr{length(rules)} association rules.
 The top three rules
-with respect to the lift measure, 
+with respect to the lift measure,
 a popular measure of rule strength, are:
 
 <<>>=
 inspect(head(sort(rules, by ="lift"),3))
 @
 
-However, it is clear that going through all the \Sexpr{length(rules)} rules 
-manually is not a viable 
+However, it is clear that going through all the \Sexpr{length(rules)} rules
+manually is not a viable
 option. We therefore will introduce different visualization techniques
 implemented in~\pkg{arulesViz}.
 All implemented visualization techniques share the
 following interface:
 
 <<eval=FALSE>>=
-plot(x, method = NULL, measure = "support", shading = "lift", 
+plot(x, method = NULL, measure = "support", shading = "lift",
   interactive = FALSE, data = NULL, control = NULL, ...)
 @
 
-where \code{x} is the set of rules to be visualized, 
+where \code{x} is the set of rules to be visualized,
 \code{method} is the visualization method,
-\code{measure} and \code{shading} contain the interest measures 
-used by the plot, 
-\code{interactive} indicates if we want to interactively 
-explore or just present the rules, 
+\code{measure} and \code{shading} contain the interest measures
+used by the plot,
+\code{interactive} indicates if we want to interactively
+explore or just present the rules,
 \code{data} can contain the transaction data set used to mine the
-rules (only necessary for some methods) and \code{control} is a list 
+rules (only necessary for some methods) and \code{control} is a list
 with further control arguments to customize the plot.
 
-In the following sections we will introduce the different visualization 
+In the following sections we will introduce the different visualization
 methods implemented in \pkg{arulesViz} and demonstrate how easy it is to
 use them.
 
@@ -305,7 +305,7 @@ with two interest measures on the axes.
 Such a presentation can be found already in an early paper by
 \cite{arulesViz:Bayardo:1999} when they discuss \emph{sc-optimal rules.}
 
-The default method for \func{plot} for association rules 
+The default method for \func{plot} for association rules
 in \pkg{arulesViz}
 is a scatter plot using support and confidence on the axes.
 In addition a third measure (default: lift) is used as the color (gray level)
@@ -322,27 +322,27 @@ plot(rules)
 \end{figure}
 
 This plot for the rules mined in the previous section is shown in
-Figure~\ref{fig:scatterplot1}. We can see 
+Figure~\ref{fig:scatterplot1}. We can see
 that rules with high lift
 have typically a relatively low support.
 \cite{arulesViz:Bayardo:1999} argue that
 the most interesting rules (sc-optimal rules)
-reside on the support/confidence border, which can be clearly seen in this 
-plot. We will show later how the interactive features of this 
+reside on the support/confidence border, which can be clearly seen in this
+plot. We will show later how the interactive features of this
 plot can be used to explore these rules.
 
 Any measure stored in the quality slot of the set of rules can be used
-for the axes (vector of length 2 for parameter \code{measure}) 
-or for color shading~(\code{shading}). 
+for the axes (vector of length 2 for parameter \code{measure})
+or for color shading~(\code{shading}).
 The following measures are available for our set of
 rules.
 <<>>=
 head(quality(rules))
 @
 
-These are the default measures generated by Apriori. To add other measures 
+These are the default measures generated by Apriori. To add other measures
 we refer the reader to the function \func{interestMeasure}
-included in \pkg{arules}. 
+included in \pkg{arules}.
 For example we can customize the plot by switching lift and confidence:
 
 <<scatterplot2, fig=TRUE, height=5, include=FALSE>>=
@@ -350,7 +350,7 @@ plot(rules, measure=c("support", "lift"), shading="confidence")
 @
 
 Figure~\ref{fig:scatterplot2} shows this plot with lift on the y-axis. Here it
-is easy to identify all rules with high lift. 
+is easy to identify all rules with high lift.
 
 \begin{figure}
 \centering
@@ -361,7 +361,7 @@ is easy to identify all rules with high lift.
 \cite{arulesViz:Unwin:2001} introduced a special version of a scatter plot
 called \emph{Two-key plot.} Here support and confidence are used for the x and
 y-axes and the color of the points is used to indicate ``order,'' i.e.,
-the number of items contained in the rule. Two-key plots can be produced 
+the number of items contained in the rule. Two-key plots can be produced
 using the unified interface by:
 
 <<scatterplot3, fig=TRUE, height=5, include=FALSE>>=
@@ -382,12 +382,12 @@ inverse relationship, which is a known fact for association rules
 
 In addition to using order for shading, we also give the plot a different
 title (\code{main}).
-Other control options including \code{pch} (best with filled symbols: 20--25), 
-\code{cex}, \code{xlim} and \code{ylim} are available and work in the 
+Other control options including \code{pch} (best with filled symbols: 20--25),
+\code{cex}, \code{xlim} and \code{ylim} are available and work in the
 usual way expected by R-users.
 
 For exploration,
-the scatter plot method offers interactive features for selecting 
+the scatter plot method offers interactive features for selecting
 and zooming. Interaction
 is activated using \code{interactive=TRUE}.
 
@@ -399,7 +399,7 @@ Interactive features include:
 \begin{itemize}
 \item Inspecting individual rules by selecting them and clicking the
 inspect button.
-\item Inspecting sets of rules 
+\item Inspecting sets of rules
 by selecting a rectangular region of the plot and clicking the
 inspect button.
 \item Zooming into a selected region (zoom in/zoom out buttons).
@@ -414,49 +414,49 @@ point will be filtered.
 \begin{figure}
 \centering
 \includegraphics[width=11cm]{scatterplot_interactive.png}
-\caption{Interactive mode for scatter plot (inspecting rules with 
+\caption{Interactive mode for scatter plot (inspecting rules with
 high lift).\label{fig:interaction}}
 \end{figure}
 
 The result of an
 example interaction is shown in Figure~\ref{fig:interaction}.
-Using a box selection the rules with the highest lift are selected. Using the 
+Using a box selection the rules with the highest lift are selected. Using the
 inspect button, the rules are displayed in the terminal below the plotting
 device.
 
 \section{Matrix-based visualizations}
 \label{sec:matrix-based}
-Matrix-based visualization techniques organize the 
-antecedent and consequent itemsets 
+Matrix-based visualization techniques organize the
+antecedent and consequent itemsets
 on the x and y-axes, respectively. A selected interest measure
 is displayed at the intersection of the antecedent and
 consequent of a given rule. If no rule is available for a
 antecedent/consequent combination the intersection area is left blank.
 
 Formally, the visualized matrix is constructed as follows.
-We start with the set of association rules 
+We start with the set of association rules
 $$\set{R} = \{
     \langle a_1,c_1,m_1\rangle, \ldots
-    \langle a_i,c_i,m_i\rangle, \ldots 
+    \langle a_i,c_i,m_i\rangle, \ldots
     \langle a_n,c_n,m_n\rangle\}$$
-where $a_i$ is the antecedent, $c_i$ is the consequent and $m_i$ is the 
+where $a_i$ is the antecedent, $c_i$ is the consequent and $m_i$ is the
 selected interest measure
-for the $i$-th rule for $i = 1,\ldots,n$.  
+for the $i$-th rule for $i = 1,\ldots,n$.
     In $\set{R}$ we identify the set of $K$ unique
 antecedents and $L$ unique consequent. We create a $L \times K$ matrix
 $\mat{M}$ with one column for each unique antecedent and one row for each
 unique consequent.  Finally, we populate the matrix by setting
 $\mat{M}_{lk} = m_i$ for $i=1,\ldots,n$ and $l$ and $k$ corresponding
 to the position of $a_i$ and $c_i$ in the matrix.
-Note that $\mat{M}$ will contain many empty cells since 
+Note that $\mat{M}$ will contain many empty cells since
 many potential association rules
 will not meet the required minimum thresholds on
 support and confidence.
 
 \cite{arulesViz:Ong:2002} presented a version of the
-matrix-based visualization 
+matrix-based visualization
 technique where a 2-dimensional matrix is used and the interest measure
-is represented by color shading of squares at the 
+is represented by color shading of squares at the
 intersection.
 An alternative visualization option is to use 3D bars at the intersection
 \citep{arulesViz:Wong:1999,arulesViz:Ong:2002}.
@@ -465,7 +465,7 @@ For this type of visualization the number of rows/columns depends on the
 number of unique itemsets in the consequent/antecedent in the set of
 rules. Since large sets of rules typically have a large number
 of different itemsets as antecedents (often not much smaller than the number of rules themselves), the size of the colored squares
-or the 3D bars gets very small and hard to see. 
+or the 3D bars gets very small and hard to see.
 We reduce the number of
 rules here by filtering out all rules with a low confidence score.
 
@@ -479,11 +479,11 @@ plot(subrules, method="matrix", measure="lift")
 @
 
 The resulting plot is shown in Figure~\ref{fig:matrix1}.
-Since there is not much space 
+Since there is not much space
 for long labels in the plot, we only show numbers as
-labels for rows and columns and the complete itemsets are printed to 
-the terminal for look-up. We omit the complete output here, 
-since this plot and the next few plots print several hundred labels 
+labels for rows and columns and the complete itemsets are printed to
+the terminal for look-up. We omit the complete output here,
+since this plot and the next few plots print several hundred labels
 to the screen. The output looks like:
 
 \begin{verbatim}
@@ -492,7 +492,7 @@ Itemsets in Antecedent (lhs)
   [2] "{curd,cereals}"
   [3] "{yogurt,cereals}"
   [4] "{butter,jam}"
-  [5] "{soups,bottled beer}" 
+  [5] "{soups,bottled beer}"
 	    (lines omitted)
   [343] "{tropical fruit,root vegetables,rolls/buns,bottled water}"
   [344] "{tropical fruit,root vegetables,yogurt,rolls/buns}"
@@ -501,21 +501,21 @@ Itemsets in Consequent (rhs)
   [4] "{tropical fruit}"   "{yogurt}"           "{root vegetables}"
 \end{verbatim}
 
-The visual impression can be improved by 
-reordering rows and columns in the matrix 
+The visual impression can be improved by
+reordering rows and columns in the matrix
 such that rules with similar values of the interest measure are presented
-closer together. 
-This removes some of the fragmentation in the 
-matrix display and therefore makes it easier to see structure. 
+closer together.
+This removes some of the fragmentation in the
+matrix display and therefore makes it easier to see structure.
 
 <<matrix2, fig=TRUE, height=3, width=10, results=hide, include=FALSE>>=
 plot(subrules, method="matrix", measure="lift", control=list(reorder=TRUE))
 @
 
-In the resulting plot in Figure~\ref{fig:matrix2} we 
-see the emergence of two large 
+In the resulting plot in Figure~\ref{fig:matrix2} we
+see the emergence of two large
 blocks of rules with two different consequents and then smaller blocks
-for the rest. With the interactive mode (\code{interactive=TRUE}) 
+for the rest. With the interactive mode (\code{interactive=TRUE})
 colored squares can be selected
 and the rule it represents will be displayed on the screen.
 This can
@@ -526,13 +526,13 @@ Reordering is done using the \pkg{seriation}
 package~\citep{arulesViz:Hahsler:2008} which provides a wide array of
 ordering methods for multivariate data. Typically, finding the optimal
 order subject to some defined objective function
-is a difficult combinatorial optimization problem which involves 
-for $n$ objects to check many of the $O(n!)$ possible permutations. 
-However, for visualization purposes 
-some suboptimal but fast heuristics are acceptable and it is 
+is a difficult combinatorial optimization problem which involves
+for $n$ objects to check many of the $O(n!)$ possible permutations.
+However, for visualization purposes
+some suboptimal but fast heuristics are acceptable and it is
 often sufficient to try several methods to find the most useful representation.
 However, it is useful to understand the different methods
-and the objective function they try to optimize. 
+and the objective function they try to optimize.
 Some available useful methods are:
 \begin{itemize}
 \item "PCA" -- First principal component. Uses the first principal component
@@ -541,26 +541,26 @@ for the data matrix and for the transposed matrix as order for
     distance matrix computation.
 
 \item "TSP" -- Traveling salesperson problem solver. Computes distance matrices
-    between rows and between columns and solves two separate TSPs. By default 
+    between rows and between columns and solves two separate TSPs. By default
     the nearest insertion heuristic is used. This method is reasonably fast for
     small rule sets, but the distance matrix computation and the associated
     memory requirements make it impractical for larger sets.
 
-\item "HC" -- Hierarchical clustering. Computes distance matrices 
+\item "HC" -- Hierarchical clustering. Computes distance matrices
     for rows and columns and
     then clusters twice. Distance matrix computation is again limiting
     the approach for smaller sets.
 
 \item "max", "avg" and "median" -- Reorder rows/columns by their maximum,
     average or median value. This extremely simple and fast methods
-    provides sometimes good visualizations. 
+    provides sometimes good visualizations.
 \end{itemize}
 
 Other available methods include "BEA", "MDS", "OLO", "GW", "ARSA" and "BBURCG".
 We refer the interested reader to \cite{arulesViz:Hahsler:2008} for
 detailed description of these methods.
 Different seriation
-methods can be selected via \code{reorderMethod} in the control list 
+methods can be selected via \code{reorderMethod} in the control list
 (default: TSP). For the methods which first compute dissimilarity matrices,
 the control list argument \code{reorderDist} can be used to specify the
 used measure (default: Euclidean distance).
@@ -569,7 +569,7 @@ Most seriation methods cannot handle missing values.
 However, the visualized matrix typically contains many missing values since
 minimum support discards of many rules during rule mining.  We use a very crude
 imputation approach by replacing the missing values in the matrix (values for
-rules not contained in the rules set) by a fixed value (0 by default). 
+rules not contained in the rules set) by a fixed value (0 by default).
 
 \begin{figure}
 \centering
@@ -585,7 +585,7 @@ rules not contained in the rules set) by a fixed value (0 by default).
 \end{figure}
 
 
-An alternative representation is to use 
+An alternative representation is to use
 3D bars (method ``matrix3D'') instead of colored rectangles.
 
 <<matrix3D1, fig=TRUE, results=hide, include=FALSE>>=
@@ -644,24 +644,24 @@ black and white printout, the different colors are not distinguishable.
 
 
 
-\section{Grouped matrix-based visualization} 
+\section{Grouped matrix-based visualization}
 \label{sec:grouped}
 
 Matrix-based visualization is limited in the number of
 rules it can visualize effectively
 since large sets of rules typically also have large sets of
 unique antecedents/consequents. Here we introduce a new visualization
-techniques~\citep{arulesViz:Hahsler2011} 
+techniques~\citep{arulesViz:Hahsler2011}
 that enhances matrix-based visualization using grouping of rules
 via clustering to handle a larger number of rules. Grouped rules
 are presented as an aggregate in the matrix and can be explored
 interactively by zooming into and out of groups.
 
-A direct approach to cluster itemsets is to define a distance metric 
-between two itemsets $X_i$ and $X_j$. 
+A direct approach to cluster itemsets is to define a distance metric
+between two itemsets $X_i$ and $X_j$.
 A good choice is the Jaccard distance defined as
 
-$$d_\mathrm{Jaccard}(X_i, X_j) = 1 -  
+$$d_\mathrm{Jaccard}(X_i, X_j) = 1 -
 \frac{|X_i \cap X_j|}{|X_i \cup X_j|}.$$
 
 The distance simply is the number of items that $X_i$ and $X_j$ have in common
@@ -680,7 +680,7 @@ Several approaches to cluster association rules and itemsets to address the
 dimensionality and sparseness problem were proposed in the literature.
 \cite{arulesViz:Toivonen:1995}, \cite{arulesViz:Gupta:1999} and
 \cite{arulesViz:Berrado:2007} propose clustering association rules by looking at
-the number of transactions which are covered by the rules.  
+the number of transactions which are covered by the rules.
 Using common covered
 transactions avoids the problems of clustering sparse, high-dimensional binary
 vectors. However, it introduces a strong bias towards clustering rules which
@@ -693,19 +693,19 @@ known frequent itemset structure from the set of association rules.
 Here we pursue a completely different approach.
 We start with the matrix
 $\mat{M}$
-defined in Section~\ref{sec:matrix-based} which 
+defined in Section~\ref{sec:matrix-based} which
 contains the values of a selected interest measure of the rules
-in set $\set{R}$. The columns/rows are the unique antecedents/consequents 
+in set $\set{R}$. The columns/rows are the unique antecedents/consequents
 in $\set{R}$, respectively.
 Now grouping antecedents becomes the problem of grouping columns
-in $\mat{M}$. To group the column vectors 
+in $\mat{M}$. To group the column vectors
 fast and efficient into $k$ groups we use $k$-means clustering.
 The default interest measure used is lift. The idea is that
 antecedents that are statistically dependent on the same consequents
-are similar and thus can be grouped together. 
+are similar and thus can be grouped together.
 Compared to other clustering approaches for itemsets,
 this method enables
-us to even group antecedents containing substitutes 
+us to even group antecedents containing substitutes
 (e.g., butter and margarine)
 which are rarely purchased together
 since they will have similar dependence to the same consequents.
@@ -714,16 +714,16 @@ The same grouping method can be used for consequents. However,
 since the mined rules
 are restricted to a single item in the
 consequent
-there is no problem with combinatorial explosion and 
+there is no problem with combinatorial explosion and
 such a grouping is typically not necessary.
 
 To visualize the grouped matrix we use a balloon plot with antecedent
-groups as columns and consequents as rows (see Figure~\ref{fig:clusterplot1}). 
+groups as columns and consequents as rows (see Figure~\ref{fig:clusterplot1}).
 The color of the balloons
 represent the aggregated interest measure in the group
 with a certain consequent and the size of the balloon shows
 the aggregated support. The default aggregation function is the median
-value in the group. The number of antecedents 
+value in the group. The number of antecedents
 and the most important (frequent) items in the group are displayed
 as the labels for the columns.
 Furthermore, the columns and rows in the plot are reordered such that
@@ -731,7 +731,7 @@ the aggregated interest measure is decreasing from top down
 and from left to right, placing the most interesting group in the
 top left corner.
 
-The matrix visualization with grouped antecedents 
+The matrix visualization with grouped antecedents
 for the set of $\Sexpr{length(rules)}$ rules mined earlier
 can be easily created by
 <<clusterplot1, fig=TRUE, include=FALSE, height=8>>=
@@ -742,7 +742,7 @@ The resulting visualization is shown in Figure~\ref{fig:clusterplot1}.
 The group of most interesting rules according to lift (the default measure)
 are shown in the top-left corner of the plot. There are 3 rules
 which contain ``Instant food products'' and up to 2 other items in the
-antecedent and the consequent is ``hamburger meat.'' 
+antecedent and the consequent is ``hamburger meat.''
 
 \begin{figure}
 \centering
@@ -774,16 +774,16 @@ sel <- plot(rules, method="grouped", interactive=TRUE)
 Here it is possible to zoom into groups and to inspect
 the rules contained in a selected group.
 
-\section{Graph-based visualizations} 
+\section{Graph-based visualizations}
 
 Graph-based techniques~\citep{arulesViz:Klemettinen:1994,arulesViz:Rainsford:2000,arulesViz:Buono:2005,arulesViz:Ertek:2006} visualize association rules
-using vertices and edges where vertices typically represent items 
-or itemsets and edges indicate relationship in rules. Interest measures are 
+using vertices and edges where vertices typically represent items
+or itemsets and edges indicate relationship in rules. Interest measures are
 typically added to the plot as labels on the edges or by color or width of
 the arrows displaying the edges.
 
 Graph-based visualization offers a very clear representation of rules but they
-tend to 
+tend to
 easily become cluttered and thus are only viable for very small sets of rules.
 For the following plots we select the 10 rules with the highest lift.
 
@@ -792,13 +792,13 @@ subrules2 <- head(sort(rules, by="lift"), 10)
 @
 
 \pkg{arulesViz} contains several graph-based visualizations
-rendered using 
-either the \emph{igraph} library via package 
+rendered using
+either the \emph{igraph} library via package
 \pkg{igraph}~\citep{arulesViz:Csardi2006}
 or
-the interface to the \emph{GraphViz} software in 
-package \pkg{Rgraphviz}~\citep{arules:Gentry:2010}. 
-By default igraph is used. 
+the interface to the \emph{GraphViz} software in
+package \pkg{Rgraphviz}~\citep{arules:Gentry:2010}.
+By default igraph is used.
 The following
 plot represents items and rules as vertices connecting them with directed edges
 (shown in Figure~\ref{fig:graph1}).
@@ -810,13 +810,13 @@ plot(subrules2, method="graph")
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{arulesViz-graph1}
-\caption{Graph-based visualization with items and rules as vertices. 
+\caption{Graph-based visualization with items and rules as vertices.
 \label{fig:graph1}}
 \end{figure}
 
 
-Another variation uses itemsets as vertices and rules are represented by 
-directed edges. 
+Another variation uses itemsets as vertices and rules are represented by
+directed edges.
 
 <<graph3, fig=TRUE, width=10, height=10, include=FALSE>>=
 plot(subrules2, method="graph", control=list(type="itemsets"))
@@ -838,8 +838,8 @@ however,
 the built-in graph based visualizations are only
 useful for small set of rules.  To explore large sets of rules with graphs,
 advanced interactive features like zooming, filtering, grouping and coloring
-nodes are needed. Such features are available in interactive visualization 
-and exploration platforms for 
+nodes are needed. Such features are available in interactive visualization
+and exploration platforms for
 networks and graphs like \emph{Gephi}~\citep{arules:Bastian:2009}.
 From \pkg{arulesViz} graphs for sets of association rules can be exported
 in the GraphML format
@@ -852,34 +852,34 @@ saveAsGraph(head(sort(rules, by="lift"),1000), file="rules.graphml")
 @
 
 Figure~\ref{fig:gephi} shows a screenshot of exploring these rules
-interactively. Rules can be explored by zooming, filtering and coloring 
+interactively. Rules can be explored by zooming, filtering and coloring
 vertices and edges.
 
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{gephi_1}
 \caption{Visualization of 1000 rules with Gephi (Fruchterman Reingold layout, vertex and label size is proportional to the in-degree, i.e., the number of
-rules the consequent participates in). 
+rules the consequent participates in).
 \label{fig:gephi}}
 \end{figure}
 
 
-\section{Parallel coordinates plot} 
+\section{Parallel coordinates plot}
 
 Parallel coordinates plots are designed to visualize multidimensional data
 where each dimension is displayed separately on the x-axis and the
-y-axis is shared. Each data point is represented by a line 
+y-axis is shared. Each data point is represented by a line
 connecting the values for each
-dimension. 
+dimension.
 %%% MFH: what does the following mean?
 Parallel coordinates plots were used previously to visualize
-discovered classification rules \citep{arulesViz:cviz} 
-and association rules \citep{arulesViz:Yang:2003}. \cite{arulesViz:Yang:2003} 
+discovered classification rules \citep{arulesViz:cviz}
+and association rules \citep{arulesViz:Yang:2003}. \cite{arulesViz:Yang:2003}
 displays the items on the y-axis as nominal values and the x-axis represents
 the positions in a rule, i.e., first item, second item, etc.  Instead of a
 simple line an arrow is used where the head points to the consequent item.
 Arrows only span enough positions on the x-axis to represent all the items in
-the rule, i.e., rules with less items are shorter arrows. 
+the rule, i.e., rules with less items are shorter arrows.
 
 <<pc1, fig=TRUE, include=FALSE, width=10>>=
 plot(subrules2, method="paracoord")
@@ -888,20 +888,20 @@ plot(subrules2, method="paracoord")
 Figure~\ref{fig:pc1} shows a parallel coordinates plot for 10 rules.
 The width of the arrows represents support and the intensity of the color
 represent confidence.
-It is obvious that 
+It is obvious that
 for larger rule sets
 visual analysis
-becomes difficult since with an increasing number of rules also 
+becomes difficult since with an increasing number of rules also
 the number of crossovers
-between the lines increases \cite{arulesViz:Yang:2003}. 
+between the lines increases \cite{arulesViz:Yang:2003}.
 
 The number of crossovers can be significantly reduced by reordering the items
 on the y-axis. Reordering the items to minimize the number of
 crossovers is a combinatorial problem with $n!$ possible permutations.
 However, for visualization purposes a suboptimal but fast solution is
-typically acceptable. We applies a variation of the well known 
+typically acceptable. We applies a variation of the well known
 2-opt heuristic
-\cite{arulesViz:Bently:1990} for travelers salesman problem 
+\cite{arulesViz:Bently:1990} for travelers salesman problem
 to the reordering problem. The objective function is to minimize the
 number of crossovers. The simple heuristic uses the following steps:
 \begin{enumerate}
@@ -933,7 +933,7 @@ to reduce crossovers.
 \caption{Parallel coordinate plot (reordered).\label{fig:pc2}}
 \end{figure}
 
-\section{Double Decker plots} 
+\section{Double Decker plots}
 \label{sec:doubledecker}
 
 A double decker plot is a variant of a mosaic plot.  A mosaic plot
@@ -944,7 +944,7 @@ only a single horizontal split.
 
 \cite{arulesViz:Hofmann:2000} introduced
 double decker plots to visualize a single association rule.
-Here the displayed contingency table is computed for a rule by counting 
+Here the displayed contingency table is computed for a rule by counting
 the occurrence frequency for each subset of items in the antecedent and
 consequent from the original data set.
 The items in the antecedent are used for the vertical splits
@@ -966,12 +966,12 @@ plot(oneRule, method="doubledecker", data = Groceries)
 \Sexpr{labels(oneRule)}.\label{fig:doubledecker1}}
 \end{figure}
 
-Figure~\ref{fig:doubledecker1} shows the resulting plot. 
+Figure~\ref{fig:doubledecker1} shows the resulting plot.
 The area of blocks gives the support and the height of the ``yes'' blocks is
 proportional to the confidence for the rules consisting of the antecedent items
 marked as ``yes.''
 Items that show a significant jump in confidence when changed from
-``no'' to ``yes'' are interesting. This is captured 
+``no'' to ``yes'' are interesting. This is captured
 by the interest measure \emph{difference of confidence} defined by
 \cite{arulesViz:Hofmann:2001}.
 
@@ -981,7 +981,7 @@ by the interest measure \emph{difference of confidence} defined by
 \section{Comparison of techniques}
 \label{sec:comp}
 
-In this section, we compare the visualization techniques 
+In this section, we compare the visualization techniques
 available in \pkg{arulesViz}
 based on the size of the rule set
 which can be analyzed, the number of interest measures which are shown
@@ -998,14 +998,14 @@ analyze large rule sets. These techniques are interactive to allow
 the analyst to zoom and select interesting rules. Matrix-based
 can accommodate rule sets of medium size. Reordering can be used to improve
 the presentation.
-To analyze small rule sets the matrix-based method with 3D bars, 
+To analyze small rule sets the matrix-based method with 3D bars,
 graph-based methods and parallel coordinates
 plots are suitable. Graphs for large rule sets can be analyzed using
-external tools like Gephi. 
+external tools like Gephi.
 Finally, double decker plots only visualize a single rule.
 
 The techniques discussed in this paper can also be
-categorized based on the number of interest measures simultaneously 
+categorized based on the number of interest measures simultaneously
 visualized. Most methods can represent two measures and scatter plots
 are even able to visualize three measures for each rule in one plot.
 
@@ -1069,10 +1069,10 @@ Double decker & \tt "doubledecker" & single rule & (2) & & & --\\
 %\subsection{Reordering Items}
 %The above mentioned problems are caused due to the unorderedness of data, mostly the data we are using for visualization is not ordered. Basically, data analysis had a problem in arranging the objects to reveal structural information. From \citep{arulesViz:seriate}, they defined this problem as seriation and also proposed methods to overcome the seriation or sequencing problem. As discussed earlier ordering or organising the data can greatly imporve the quality of visualization.
 %We integrated these seriation methods with some of our visualization techniques to understand the data in efficient way. We can not apply these seriation methods to all of our techniques since we are preprocessing the generated data differently for each of the visualization techniques. So, to avoid the overcrowded and cluttered displays for other techiniques we ordered the data by sorting or rearranging the data items.
-%We applied these seriation methods to matrix shading technique to analyze the rules in more understanding way. As we are using matrix data structure to represent the data, so we applied some seriation methods discussed in \citep{arulesViz:seriate} and after convincing results we extended our work in using and designing ordering methods, which improved the quality of data representation. 
+%We applied these seriation methods to matrix shading technique to analyze the rules in more understanding way. As we are using matrix data structure to represent the data, so we applied some seriation methods discussed in \citep{arulesViz:seriate} and after convincing results we extended our work in using and designing ordering methods, which improved the quality of data representation.
 %
 %\subsection{Clustering Items}
-%Too many rules cause overlapping problem for visual interpretation, which is due to limited space. Clustering can help in visualizing and ordering the items, by reducing the large number of association rules \citep{arulesViz:clusrules}, which is achieved by  clustering the rules based on quantitative attributes. For example the rules \{$age=16 \Rightarrow salary=0$\} and \{$age=17 \Rightarrow salary=0$\} after clustering the antecedent items based on consequent, now the rule changed as \{$17<age>16 \Rightarrow salary=0$\}. \citep{arulesViz:disclus}, they are clustering the association rules based on the distance metric and the distance could be found from the quality measures like support, confidence, etc,. 
+%Too many rules cause overlapping problem for visual interpretation, which is due to limited space. Clustering can help in visualizing and ordering the items, by reducing the large number of association rules \citep{arulesViz:clusrules}, which is achieved by  clustering the rules based on quantitative attributes. For example the rules \{$age=16 \Rightarrow salary=0$\} and \{$age=17 \Rightarrow salary=0$\} after clustering the antecedent items based on consequent, now the rule changed as \{$17<age>16 \Rightarrow salary=0$\}. \citep{arulesViz:disclus}, they are clustering the association rules based on the distance metric and the distance could be found from the quality measures like support, confidence, etc,.
 %This clustering can be applied to 3D matrix and cluster plot. As we are using this clustering to accomodate more number of rules and also to find which of the consequent items have the similar antecedent items.
 %
 
@@ -1083,16 +1083,16 @@ Double decker & \tt "doubledecker" & single rule & (2) & & & --\\
 
 Association rule mining algorithms typically generate a large number of
 association rules which poses a major problem for understanding and analyzing
-rules.  In this paper we presented several visualization techniques 
-implemented in \pkg{arulesViz} which can be used to explore and present 
-sets of association rules.  
-In addition we present a new interactive visualization method called 
+rules.  In this paper we presented several visualization techniques
+implemented in \pkg{arulesViz} which can be used to explore and present
+sets of association rules.
+In addition we present a new interactive visualization method called
 grouped matrix-based visualization which can used to effectively
 explore large rule sets.
 
 Future development will focus on
 enhancing the visualizing techniques with advanced interactive features
-using for example \pkg{iplots}~\citep{arulesViz:Urbanek:2003} 
+using for example \pkg{iplots}~\citep{arulesViz:Urbanek:2003}
 which supports in addition to selection and zooming
 also brushing and linking between different plots.
 

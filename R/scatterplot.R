@@ -36,7 +36,7 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
     #col = heat_hcl(100),
     #gray_range = c(.1,.8),
     newpage = TRUE,
-    jitter = 0
+    jitter = NA
   ))
   
   
@@ -204,8 +204,19 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
   
   ## reverse colors
   colors <- rev(control$col)
+ 
+   
+  q <- quality(rules)[, na.omit(c(measure, shading))]
   
-  q <- quality(rules)
+  ## handle Inf
+  for(i in 1:ncol(q)) {
+    infin <- is.infinite(q[[i]])
+    if(any(infin)) {
+      replinfin <- signif(2 * max(q[[i]][!infin], na.rm = TRUE), 3)
+      warning(colnames(q)[i], " contains infinite values! Replaced by twice the max (", replinfin, ")!")
+      q[[i]][infin] <- replinfin
+    }
+ }
   
   if(control$newpage) grid.newpage()
   
@@ -273,10 +284,16 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
     just = c("left", "bottom")))
   
   x <- q[, c(measure[1], measure[2])]
-  
-  if(control$jitter >0) {
-    x[,1] <- jitter(x[,1], factor=control$jitter)
-    x[,2] <- jitter(x[,2], factor=control$jitter)
+ 
+  control$jitter <- control$jitter[1]
+  if(is.na(control$jitter) && any(duplicated(x))) {
+    #warning("To reduce overplotting, jitter is set to 1!")
+    control$jitter <- .2
+    }
+   
+  if(!is.na(control$jitter) && control$jitter>0) {
+    x[,1] <- jitter(x[,1], factor=control$jitter, amount = 0)
+    x[,2] <- jitter(x[,2], factor=control$jitter, amount = 0)
   }
   
   

@@ -4,7 +4,7 @@
 \alias{plot.itemsets}
 \alias{plot.rules}
 \alias{plot.grouped_matrix}
-\title{Plot method to visualize association rules and itemsets}
+\title{Visualize Association Rules and Itemsets}
 \description{
 This is the S3 method to visualize association rules and itemsets.
 Implemented are several popular visualization methods 
@@ -73,7 +73,7 @@ The list of control parameters for this method is:
 \item{"pch"}{ use filled symbols: 20--25}
 \item{"cex"}{symbol size}
 \item{"xlim","ylim"}{limits}
-\item{"jitter"}{a number greater than 0 adds jitter to the points}
+\item{"jitter"}{a number greater than 0 adds jitter to the points. If overplotting would occur, jitter defaults to .1.}
 \item{"col"}{color palette}
 }
 
@@ -81,7 +81,7 @@ The list of control parameters for this method is:
 
 \item{"matrix", "matrix3D"}{ 
 Arranges the association rules as a matrix with the itemsets in the antecedents
-on one axis and the itemsets in the consequent on the other.  The interest
+on one axis and the itemsets in the consequents on the other.  The interest
 measure is either visualized by a color (darker means a higher value for the
 measure) or as the height of a bar (method "matrix3D").
 
@@ -106,18 +106,25 @@ used for reordering (see \code{seriate()} method in \pkg{seriation})}
 }
 
 \item{"grouped"}{
-Grouped matrix-based visualization (Hahsler and Chelloboina, 2011; Hahsler and Karpienko, 2016). 
+Grouped matrix-based visualization (Hahsler and Karpienko, 2016; Hahsler 2016). 
 Antecedents (columns) in the matrix are
-grouped using clustering. Groups are represented as balloons
-in the matrix.
+grouped using clustering. Groups are represented by the most
+interesting item (highest ratio of support in the group to support in all rules) 
+in the group. Balloons
+in the matrix are used to represent with what consequent the antecedents are 
+connected.
 
-Interactive manipulations are available. 
+Interactive manipulations are available. They can be used to zoom into groups
+and identify rules.
 
 
 The list of control parameters for this method is:
 \describe{
 \item{"main"}{plot title}
 \item{"k"}{number of antecedent groups (default: 20)}
+\item{"rhs_max"}{maximal number of RHSs to show. The rest are 
+  suppressed. (default: 10)}
+\item{"lhs_items"}{number of LHS items shown (default: 2)}
 \item{"aggr.fun"}{aggregation function
 can be any function computing a scalar from a vector
 (e.g., min, mean, median (default), sum, max). It is also used
@@ -204,12 +211,9 @@ Bruzzese, D. and Davino, C. (2008), Visual Mining of Association Rules, in
 Visual Data Mining: Theory, Techniques and Tools for Visual Analytics,
 Springer-Verlag, pp. 103--122.
 
-Hahsler, M. and Chelluboina, S. (2011), Visualizing association rules in
-hierarchical groups. Presented at the 42nd Symposium on the Interface: 
-Statistical, Machine Learning, and Visualization Algorithms 
-(Interface 2011). The Interface Foundation of North America.
-
 Hahsler, M. and Karpienko, R. (2016) Visualizing Association Rules in Hierarchical Groups. \emph{Journal of Business Economics,} accepted for publication, 2016.
+
+Hahsler, M. (2016) Grouping association rules using lift. In C. Iyigun, R. Moghaddess, and A. Oztekin, editors, 11th INFORMS Workshop on Data Mining and Decision Analytics (DM-DA 2016).
 }
 
 \seealso{
@@ -221,7 +225,7 @@ Hahsler, M. and Karpienko, R. (2016) Visualizing Association Rules in Hierarchic
 }
 \examples{
 data(Groceries)
-rules <- apriori(Groceries, parameter=list(support=0.005, confidence=0.5))
+rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.8))
 rules
 
 ## Scatterplot
@@ -241,7 +245,7 @@ plot(rules, shading="order", control = list(main = "Two-key plot",
   col=rainbow(max(size(rules))-1L)))
 
 ## The following techniques work better with fewer rules
-subrules <- subset(rules, lift>2.5)
+subrules <- subset(rules, lift>5)
 subrules
   
 ## 2D matrix with shading
@@ -268,7 +272,7 @@ plot(rules, method="grouped",
 ## try: sel <- plot(rules, method="grouped", interactive=TRUE)
 
 ## graphs only work well with very few rules
-subrules2 <- sample(rules, 10)
+subrules2 <- sample(subrules, 25)
 plot(subrules2, method="graph")
 plot(subrules2, method="graph", 
   control = list(nodeCol = grey.colors(10), edgeCol = grey(.7), alpha = 1))

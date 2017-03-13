@@ -38,7 +38,7 @@ inspect(head(sort(rules, by ="lift"),3))
 ###################################################
 ### code chunk number 6: arulesViz.Rnw:281-283 (eval = FALSE)
 ###################################################
-## plot(x, method = NULL, measure = "support", shading = "lift", 
+## plot(x, method = NULL, measure = "support", shading = "lift",
 ##   interactive = FALSE, data = NULL, control = NULL, ...)
 
 
