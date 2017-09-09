@@ -16,38 +16,41 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-matrix_arules <- function(rules, measure = "support", control = NULL, ...){
+matrix_arules <- function(rules, measure = "lift", control = NULL, ...){
+ 
+  engines <- c("default", "interactive", "base", "3d", "plotly", "htmlwidget")
+  m <- pmatch(control$engine, engines, nomatch = 0)
+  if(m == 0) stop("Unknown engine: ", sQuote(control$engine), 
+    " Valid engines: ", paste(sQuote(engines), collapse = ", "))
+  control$engine <- engines[m] 
+  
+  control <- c(control, list(...))
+  
+  ### FIXME: fix max and control & reorder!
+  if(pmatch(control$engine, c("plotly", "htmlwidget"), nomatch = 0) >0) { 
+    return(matrix_plotly(rules, measure = measure, control = control)) 
+  }
   
   control <- .get_parameters(control, list(
-    main = paste("Matrix with",length(rules),"rules"),
+    main = paste("Matrix with", length(rules), "rules"),
     #col = gray.colors(100, 0.3, .8),
+    engine = "default",
     col = default_colors(100),
     zlim = NULL,
     axes = TRUE,
-    reorder = FALSE,
-    reorderBy = NULL,
-    reorderMethod = "TSP",
-    reorderControl = NULL,
-    reorderDist = "euclidean",
-    type = "grid",
+    reorder = TRUE,
     newpage = TRUE,
-    interactive = FALSE
+    plot_options = list()
   ))
-  
   
   ## somehow the colors are reversed
   control$col <- rev(control$col) 
   
   ## regular case (only one measure)
   if(length(measure) < 2) ret <- matrix_int(rules, measure, control, ...)
-  else ret <- matrix_int2(rules, measure, control, ...)
+  else ret <- matrix_int2(rules, measure, control)
   
-  
-  if(!control$interactive) return(invisible())
-  if(control$type != "grid") {
-    cat("Interactive mode not available for this method!\n")
-    return(invisible())
-  }
+  if(control$engine != "interactive") return(invisible())
   
   ## interactive mode
   cat("Interactive mode.\nIdentify rules by selecting them.\nEnd interactive mode by clicking outside the plotting area!\n")
@@ -79,19 +82,13 @@ matrix_arules <- function(rules, measure = "support", control = NULL, ...){
 
 
 
-matrix_int <- function(rules, measure, control, ...){
+matrix_int <- function(rules, measure, control){
   m <- rulesAsMatrix(rules, measure)
   
-  
-  if(control$reorder == TRUE)
-  {
-    if(is.null(control$reorderBy)) mReorder <- m
-    else mReorder <- rulesAsMatrix(rules, control$reorderBy)
-    
-    order <- .reorder(mReorder, rules, method=control$reorderMethod,
-      control=control$reorderControl);
-    m <- permute(m, order)
-    
+  if(control$reorder == TRUE){
+    cm <- colMeans(m, na.rm = TRUE)
+    rm <- rowMeans(m, na.rm = TRUE)
+    m <- m[order(rm, decreasing = FALSE), order(cm, decreasing = TRUE)]
   }
   
   writeLines("Itemsets in Antecedent (LHS)")
@@ -100,21 +97,21 @@ matrix_int <- function(rules, measure, control, ...){
   print(rownames(m))
   
   
-  if (control$type == "image") {
-    image(t(m), col = control$col, xlab = "Antecedent (LHS)", 
+  if (control$engine == "base") {
+    do.call(image, c(list(t(m), col = control$col, xlab = "Antecedent (LHS)", 
       ylab = "Consequent (RHS)", main = control$main, 
-      sub=paste("Measure:", measure), axes=FALSE, ...)
+      sub=paste("Measure:", measure), axes=FALSE)), control$plot_options)
     if(control$axes) {
       axis(1, labels=1:ncol(m), at=(0:(ncol(m)-1))/(ncol(m)-1))
       axis(2, labels=1:nrow(m), at=(0:(nrow(m)-1))/(nrow(m)-1))
     }
     box()
   }
-  else if (control$type == "3d") {
+  else if (control$engine == "3d") {
     df <- cbind(which(!is.na(m), arr.ind=TRUE), as.vector(m[!is.na(m)]))
-    scatterplot3d(df, zlab = measure, xlab="Consequent (RHS)", 
+    do.call(scatterplot3d, c(list(df, zlab = measure, xlab="Consequent (RHS)", 
       ylab= "Antecedent (LHS)", main = control$main,
-      type="h", pch="", ...)
+      type="h", pch=""), control$plot_options))
   }
   else
   {
@@ -145,8 +142,9 @@ matrix_int <- function(rules, measure, control, ...){
     cols[is.na(cols)] <- control$col[length(control$col)]
     cols[is.na(m)] <- NA
     
-    gImage(cols, xlab="Antecedent (LHS)", ylab="Consequent (RHS)", 
-      name="image", axes = "integer", ...)
+    do.call(gImage, c(list(cols, xlab="Antecedent (LHS)", 
+      ylab="Consequent (RHS)", 
+      name="image", axes = "integer"), control$plot_options))
     
     upViewport(1)
     
@@ -170,11 +168,12 @@ matrix_int <- function(rules, measure, control, ...){
 
 
 ## 2 measures
-matrix_int2 <- function(rules, measure, control, ...){
+matrix_int2 <- function(rules, measure, control){
   
   m1 <- rulesAsMatrix(rules, measure[1])
   m2 <- rulesAsMatrix(rules, measure[2])
-  
+ 
+  ### FIXME: This does not work anymore!!!
   if(control$reorder == TRUE)
   {
     if(is.null(control$reorderBy)) m_reorder <- m1

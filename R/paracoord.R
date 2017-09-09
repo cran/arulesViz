@@ -19,11 +19,12 @@
 
 paracoord_arules <- function(x, measure= "support", shading = "lift", 
   control=list(), ...) {
-  
+
   control <- .get_parameters(control, list(
-    main =paste("Parallel coordinates plot for", length(x), "rules"),
+    main = paste("Parallel coordinates plot for", length(x), "rules"),
     reorder = FALSE,
     interactive = FALSE,
+    engine = "default",
     gp_labels = gpar(),
     newpage = TRUE,
     col = default_colors(100),
@@ -32,16 +33,24 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
     verbose = FALSE
   ))
   
+  if(pmatch(control$engine, c("default"), nomatch = 0) == 0)  
+    stop("Unknown engine for parallel coordinates plot '", control$engine, 
+      "' - Valid engine: 'default'.")
+    
   
+  if(control$interactive) stop("Interactive mode not available for parallel coordinates plot.")
+   
   ## remove short rules
   x <- x[size(x)>1]
+  if(length(x)<1) stop("No rules of length 2 or longer.")
+  
   
   ## sort rules to minimize occlusion
   x <- sort(x, by=shading,  decreasing = FALSE)
   lwd <- map(quality(x)[[measure]], c(1,5))
-  col <- .col_picker(map(quality(x)[[shading]]), control$col, 
+  col <- .col_picker(map(quality(x)[[shading]]), rev(control$col), 
     alpha = control$alpha)
-  
+   
   l <- LIST(lhs(x))
   r <- LIST(rhs(x))
   u <- union(unlist(l), unlist(r))
@@ -51,20 +60,19 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
   pl <- t(sapply(l, FUN = function(x)  {
     x <- match(x, u)
     # reordering items of antecedent
-    #if(control$reorder) x <- sort(x, decreasing = TRUE)
     length(x) <- maxLenLHS
     rev(x) ## so NAs are to the left (we could also use na.last for sort)
   }))
   
-  ## make the items increasing
-  pl <- t(apply(pl, MARGIN=1, sort, na.last=FALSE, decreasing=FALSE))
   
-  ## RHS is always 1 for now
+  ## RHS is always a single item for now
   pr <- sapply(r, FUN = function(x)  match(x, u))
   
   m <- cbind(pl,pr)
+  colnames(m) <- c(ncol(pl):1, "rhs")
   
-  if(control$reorder) {
+  ### reduce crossovers
+  if(control$reorder && length(x)>1) {
     count <- countCrossovers(m)
     noswapcount <- 0
     order <- seq(n)
@@ -86,7 +94,6 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
       order_tmp[i] <- order[j]
       
       pl_tmp <- matrix(order_tmp[pl], nrow=nrow(pl))
-      pl_tmp <- t(apply(pl_tmp, MARGIN=1, sort, na.last=FALSE, decreasing=FALSE))
       pr_tmp <- order_tmp[pr]
       
       count_tmp <- countCrossovers(cbind(pl_tmp, pr_tmp))
@@ -100,15 +107,12 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
       }
     }
     
-    pl <- matrix(order[pl], nrow=nrow(pl))
-    pl <- t(apply(pl, MARGIN=1, sort, na.last=FALSE, decreasing=FALSE))
+    pl[] <- order[pl]
     pr <- order[pr]
+    u <- u[order(order)]
     
     m <- cbind(pl,pr)
     colnames(m) <- c(ncol(pl):1, "rhs")
-    
-    u <- u[order]
-    
   }
   
   
@@ -137,16 +141,27 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
 
 paracoord_items <- function(x, measure= "support", shading = NULL,
   control=list(), ...) {
-  
+ 
+    control <- c(control, list(...))
+
   control <- .get_parameters(control, list(
     main =paste("Parallel coordinates plot for", 
       length(x), "itemsets"),
     reorder = FALSE,
+    engine = "default",
     interactive = FALSE,
     gp_labels = gpar(),
     newpage = TRUE,
     alpha = NULL
   ))
+  
+  if(pmatch(control$engine, c("default"), nomatch = 0) == 0)  
+    stop("Unknown engine for parallel coordinates plot '", control$engine, 
+      "' - Valid engine: 'default'.")
+    
+  
+  if(control$interactive) stop("Interactive mode not available for parallel coordinates plot.")
+   
   
   
   ## remove single items

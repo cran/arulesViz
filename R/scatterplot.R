@@ -21,10 +21,21 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
   shading = "lift", control = NULL, ...){
   
   control <- c(control, list(...))  
-  
+
+  engines <- c("default", "interactive", "plotly", "htmlwidget")
+  m <- pmatch(control$engine, engines, nomatch = 0)
+  if(m == 0) stop("Unknown engine: ", sQuote(control$engine), 
+    " Valid engines: ", paste(sQuote(engines), collapse = ", "))
+  control$engine <- engines[m] 
+    
+  if(pmatch(control$engine, c("plotly", "htmlwidget"), nomatch = 0) >0) { 
+    return(scatterplot_plotly(rules, measure = measure,
+      shading = shading, control = control)) ### control has max
+  }
+ 
   control <- .get_parameters(control, list(
     main =paste("Scatter plot for", length(rules), class(rules)),
-    interactive = FALSE,
+    engine = "default",
     pch = 19,
     cex = .5,
     xlim = NULL,
@@ -61,8 +72,8 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
   ## call workhorse
   scatterplot_int(rules, measure, shading, control, ...)
   
-  if(!control$interactive) return(invisible())
-  
+  if(control$engine != "interactive") return(invisible())
+   
   ## interactive mode
   cat("Interactive mode.\nSelect a region with two clicks!\n")
   
@@ -187,8 +198,11 @@ scatterplot_arules <- function(rules, measure = c("support","confidence"),
       sel_r <- rules[filterSelection(sel, q)]
       
       if(length(sel_r) > 0) {
-        cat("\nNumber of rules selected:", length(sel_r),"\n")
-        inspect(sort(sel_r, by = shading))
+        cat("\nNumber of", class(rules), "selected:", length(sel_r),"\n")
+        if(!is.null(shading) && !is.na(shading)) 
+          inspect(sort(sel_r, by = shading))
+        else
+          inspect(sel_r)
         cat("\n")
       } else cat("No rules selected!\n")
       
@@ -204,7 +218,6 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
   
   ## reverse colors
   colors <- rev(control$col)
- 
    
   q <- quality(rules)[, na.omit(c(measure, shading))]
   
@@ -213,15 +226,19 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
     infin <- is.infinite(q[[i]])
     if(any(infin)) {
       replinfin <- signif(2 * max(q[[i]][!infin], na.rm = TRUE), 3)
-      warning(colnames(q)[i], " contains infinite values! Replaced by twice the max (", replinfin, ")!")
+      warning("plot: ", colnames(q)[i], 
+        " contains infinite values! Replaced by twice the max (", 
+        replinfin, ")!", call. = FALSE)
       q[[i]][infin] <- replinfin
     }
  }
   
   if(control$newpage) grid.newpage()
   
-  if(control$interactive) addspace <- 2.5
-  else addspace <- 0
+  if(control$engine == "interactive")
+    addspace <- 2.5
+  else 
+    addspace <- 0
   
   ## main
   gTitle(control$main)

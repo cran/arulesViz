@@ -21,13 +21,21 @@ grouped_matrix_arules <- function(rules, measure, shading, control=NULL, ...){
   
   ## measure controls circle size
   ## shading controls color
-  
+ 
+  engines <- c("default", "interactive")
+  m <- pmatch(control$engine, engines, nomatch = 0)
+  if(m == 0) stop("Unknown engine: ", sQuote(control$engine), 
+    " Valid engines: ", paste(sQuote(engines), collapse = ", "))
+  control$engine <- engines[m] 
+ 
+  control <- c(control, list(...))
+
   control <- .get_parameters(control, list(
     main = paste("Grouped Matrix for", length(rules), "Rules"),
     k = 20,
     rhs_max = 10,
     lhs_items = 2,
-    aggr.fun=median, 
+    aggr.fun=mean, 
     ## fix lift so serveral plots are comparable (NA: take max)
     col = default_colors(100),
     reverse = TRUE, 
@@ -41,14 +49,13 @@ grouped_matrix_arules <- function(rules, measure, shading, control=NULL, ...){
     gp_labs   = gpar(cex=1.2, fontface="bold"),
     gp_lines  = gpar(col="gray", lty=3),
     newpage=TRUE,
-    interactive = FALSE,
-    max.shading=NA
+    max.shading=NA,
+    engine = "default"
   ))
-  
   
   x <- grouped_matrix_int(rules, measure, shading, control) 
   
-  if(!control$interactive) return(invisible(x))
+  if(control$engine !="interactive") return(invisible(x))
   
   ## interactive mode
   cat("Interactive mode.\n")
@@ -119,7 +126,7 @@ grouped_matrix_arules <- function(rules, measure, shading, control=NULL, ...){
       cat("Zooming in. This might take a while\n")
       
       ret <- grouped_matrix_arules(rulesSelected, measure, 
-        shading, control, ...)
+        shading, control)
       
       if(!identical(ret, "zoom out")) return(ret)
       

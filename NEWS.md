@@ -1,14 +1,39 @@
+# arulesViz 1.3-0 (09/07/2017)
+
+## New features
+* Introduced engine parameter for plot which can be used to create htmlWidgets.
+    Matrices and scatterplots use plotly and graphs are plotted 
+    using visNetwork.
+
+## Changes
+* Some work was done on unifying the interface for plot more resulting in a
+    slightly changed order of parameters.
+* Parameter interactive is now deprecated and will be removed in future
+    releases. Use engine = "interactive" or engine = "htmlWidget" 
+    (where available).
+* matrix-based visualization: reordering now tries to order by measure of 
+  interestingness. The plot now uses shading instead of measure.
+* method graph does not support type anymore. Only items are now supported as 
+  vertices.
+
+## Bug Fix
+* Fixed item labels order in reordered parallel coordinates plot 
+    (reported by Yvi24).
+
+
 # arulesViz 1.2-1 (03/12/2017)
 
-* arules_plotly uses now signif instead of round for quality measures. 
-* arules_plotly shows correct rule indices for too large rule sets. 
-* arules_plotly implements now jitter to reduce overplotting (defaults
-    to .1 if overplotting would occur)
-* regular scatter plot also defaults jitter to .2 if overplotting would occur.
+## New features
+
 * plot method "grouped" now shows the most interesting items instead of the
   most frequent items to represent antecedents. Also, if more than 10 RHS
   items are found, then only the 10 most important are shown (see control 
-  argument rhs_max)
+  argument rhs_max).
+* arules_plotly uses now signif instead of round for quality measures. 
+* arules_plotly implements now jitter to reduce overplotting (defaults
+    to .1 if overplotting would occur).
+* arules_plotly shows correct rule indices for too large rule sets. 
+* scatterplot also defaults jitter to .2 if overplotting would occur.
 * scatterplot now handles Inf with a warning.
 
 # arulesViz 1.2-0 (10/02/2016)
