@@ -1,12 +1,13 @@
 # arulesViz - Visualizing Association Rules and Frequent Itemsets with R
 
 [![CRAN version](http://www.r-pkg.org/badges/version/arulesViz)](https://cran.r-project.org/package=arulesViz)
+[![Rdoc](http://www.rdocumentation.org/badges/version/arulesViz)](http://www.rdocumentation.org/packages/arulesViz) 
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/arulesViz)](https://cran.r-project.org/package=arulesViz)
 [![Travis-CI Build Status](https://travis-ci.org/mhahsler/arulesViz.svg?branch=master)](https://travis-ci.org/mhahsler/arulesViz)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/arulesViz?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/arulesViz)
 
 This R package 
-extends package [arules](http://mhahsler.github.io/arules/) with various visualization techniques for association rules and itemsets. The package also includes several interactive visualizations for rule exploration.
+extends package [arules](https://github.com/mhahsler/arules) with various visualization techniques for association rules and itemsets. The package also includes several interactive visualizations for rule exploration.
 
 ## Installation
 
@@ -57,9 +58,6 @@ plot(rules)
 plotly_arules(rules)
 ```
 
-<iframe src="https://rawgit.com/mhahsler/arulesViz/master/README/plotly_arules.html" width="100%" height="500">
-</iframe>
-
 [Open example output.](https://rawgit.com/mhahsler/arulesViz/master/README/plotly_arules.html)
 
 
@@ -68,14 +66,12 @@ plotly_arules(rules)
 inspectDT(rules)
 ```
 
-<iframe src="https://rawgit.com/mhahsler/arulesViz/master/README/inspectDT.html" width="100%" height="800">
-</iframe>
-
 [Open example output.](https://rawgit.com/mhahsler/arulesViz/master/README/inspectDT.html)
 
 ## References
 
 * [Intro article](https://cran.r-project.org/package=arulesViz/vignettes/arulesViz.pdf) with complete examples by Michael Hahsler and Sudheer Chelluboina.
+* Michael Hahsler. [arulesViz: Visualizing association rules with R.](https://journal.r-project.org/archive/2017/RJ-2017-047/) _R Journal,_ 9(2):163-175, December 2017.
 * Michael Hahsler, Sudheer Chelluboina, Kurt Hornik, and Christian Buchta. [The arules R-package ecosystem: Analyzing interesting patterns from large transaction datasets.](http://jmlr.csail.mit.edu/papers/v12/hahsler11a.html) _Journal of Machine Learning Research,_ 12:1977-1981, 2011.
 
 

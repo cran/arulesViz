@@ -18,11 +18,19 @@
 
 # plotly interactive plots using d3.js
 
-#plot <- function(x, method = NULL, measure = "support", 
-#  shading = "lift", interactive = FALSE, data = NULL, control = NULL, ...) {
-
 
 plotly_arules <- function(x, method = "scatterplot", 
+  measure = c("support", "confidence"), shading = "lift", 
+  max = 1000, ...) {
+  
+  .Deprecated("plot")
+
+  .plotly_arules(x, method, 
+    measure, shading, 
+    1000, ...)
+}
+
+.plotly_arules <- function(x, method = "scatterplot", 
   measure = c("support", "confidence"), shading = "lift", 
   max = 1000, ...) {
   
@@ -42,7 +50,7 @@ plotly_arules <- function(x, method = "scatterplot",
     methodNr <- 1
   }
   
-  quality(x)[["order"]] <- size(x) 
+  #quality(x)[["order"]] <- size(x) 
   qnames <- names(quality(x))
   measure <- qnames[pmatch(measure, qnames, duplicates.ok = TRUE)]
   shading <- qnames[pmatch(shading, qnames)]
@@ -66,6 +74,7 @@ scatterplot_plotly <- function(x,
     colors = default_colors(2), 
     jitter = NA, 
     precision = 3,
+    main = "Unused",
     marker = list()
   ))
   
@@ -128,11 +137,12 @@ scatterplot_plotly <- function(x,
   ### add x/y-jitter
   jitter <- jitter[1]
   if(is.na(jitter) && any(duplicated(q[,measure]))) {
-      jitter <- .1
+    message("To reduce overplotting, jitter is added! Use jitter = 0 to prevent jitter.")   
+    jitter <- .1
   }
   
   if(!is.na(jitter) && jitter>0) 
-    for(m in measure) q[[m]] <- jitter(q[[m]], factor = jitter, amount = 0)
+    for(m in measure) q[[m]] <- jitter(q[[m]], factor = jitter)
 
   if(is.na(shading)) 
     p <- plot_ly(q, type = "scatter", x = q[,measure[1]], y = q[,measure[2]], 
@@ -170,7 +180,7 @@ matrix_plotly <- function(x, measure, shading, control, ...) {
     engine = "htmlwidget",
     max = 1000,
     colors = default_colors(2), 
-    reorder = TRUE,
+    reorder = "measure",
     precision = 3
   ))
   
@@ -180,7 +190,7 @@ matrix_plotly <- function(x, measure, shading, control, ...) {
   .plotly_matrix(x, measure[1], reorder = control$reorder, 
     colors = control$colors, precision = control$precision, max = control$max) }
 
-.plotly_matrix <- function(x, measure = "lift", reorder = TRUE, 
+.plotly_matrix <- function(x, measure = "lift", reorder = "none", 
   #colors = colorRamp(c("grey", "red"))) {
   colors = default_colors(2), precision = 3, max = 1000) {
   
@@ -195,16 +205,42 @@ matrix_plotly <- function(x, measure, shading, control, ...) {
   
   m <- rulesAsMatrix(x, measure = measure, itemSep= ',<BR>&nbsp;&nbsp;', 
     setStart = '<B>{', setEnd = '}</B>')
+  m_s <- rulesAsMatrix(x, "support")
+  m_c <- rulesAsMatrix(x, "confidence")
   
-  if(reorder) {
-    cm <- colMeans(m, na.rm = TRUE)
-    rm <- rowMeans(m, na.rm = TRUE)
-    m <- m[order(rm, decreasing = FALSE), order(cm, decreasing = TRUE)]
-  }
+  reorderTypes <- c("none", "measure", "support/confidence", "similarity")
+  reorderType <- pmatch(reorder , reorderTypes, nomatch = 0)
+  if(reorderType == 0) stop("Unknown reorder method: ", sQuote(reorder), 
+    " Valid reorder methods are: ", paste(sQuote(reorderTypes), 
+      collapse = ", "))
+  if(reorderType == 2){
+    cm <- order(colMeans(m, na.rm = TRUE), decreasing = FALSE)
+    rm <- order(rowMeans(m, na.rm = TRUE), decreasing = FALSE)
+    m <- m[rm, cm]
+    m_s <- m_s[rm, cm]
+    m_c <- m_c[rm, cm]
+  } else if(reorderType == 3){
+    cm <- order(colMeans(m_s, na.rm = TRUE), decreasing = FALSE)
+    rm <- order(rowMeans(m_c, na.rm = TRUE), decreasing = FALSE)
+    m <- m[rm, cm]
+    m_s <- m_s[rm, cm]
+    m_c <- m_c[rm, cm]
+  } else if(reorderType == 4){
+    d <- dissimilarity(lhs(x), method = "jaccard")
+    cm <- get_order(seriate(d))
+    rm <- order(rowMeans(m, na.rm = TRUE), decreasing = FALSE)
+    m <- m[rm, cm]
+    m_s <- m_s[rm, cm]
+    m_c <- m_c[rm, cm]
+  } 
 
   
   txt <- t(outer(colnames(m), rownames(m), paste, sep = '<BR>&nbsp;&nbsp; => '))
-  txt[] <- paste('<B>', txt, '</B>', '<BR>',measure, ': ', signif(m, precision), sep = '')
+  txt[] <- paste('<B>', txt, '</B>', 
+    '<BR>',measure, ': ', signif(m, precision), 
+    '<BR>','support', ': ', signif(m_s, precision), 
+    '<BR>','confidence', ': ', signif(m_c, precision), 
+    sep = '')
   txt[is.na(m)] <- NA
   
   plot_ly(z = m,
