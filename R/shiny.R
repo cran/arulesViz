@@ -46,6 +46,11 @@ ruleExplorer <- function(x, parameter = NULL) {
   zIndexCached <- "lift"
   
   #logOutput <- shiny::reactiveVal('Output log')
+ 
+  ### js cannot handle very large arrays
+  itemLabels <- itemLabels(dataset)
+  if(length(itemLabels) > 10000) 
+    itemLabels <- list('Disabled because of excessive number of items (>10,000)'= c(""))
   
   if(is(dataset, "rules")) {
     if(length(dataset) < 1) stop("Zero rules provided!")
@@ -86,7 +91,7 @@ ruleExplorer <- function(x, parameter = NULL) {
         shiny::uiOutput("yAxisSelectInput"),
         shiny::uiOutput("cAxisSelectInput"),
         shiny::br(),
-        shiny::sliderInput("supp", "Minimum Support:", min = minSupp, max = maxSupp, value = supp , step = (maxSupp-minSupp)/1000, sep =""),
+        shiny::sliderInput("supp", "Minimum Support:", min = minSupp, max = maxSupp, value = supp , step = (maxSupp-minSupp)/10000, sep =""),
         shiny::sliderInput("conf", "Minimum Confidence:", min = minConf, max = maxConf, value = conf , step =  (maxConf-minConf)/1000, sep = ""), 
         shiny::sliderInput("lift", "Minimum Lift:", min = minLift, max = maxLift, value = lift , step =  (maxLift-minLift)/1000, sep = ""), 
         shiny::numericInput("minL", "Min. items in rule:", 2), 
@@ -151,22 +156,16 @@ ruleExplorer <- function(x, parameter = NULL) {
       })
       
       output$choose_columns <- shiny::renderUI({
-        shiny::selectizeInput('cols',NULL,
-          itemLabels(dataset),
-          multiple = TRUE)
+        shiny::selectizeInput('cols', NULL, itemLabels, multiple = TRUE)
       })
       
       
       output$choose_lhs <- shiny::renderUI({
-        shiny::selectizeInput('colsLHS',NULL,
-          itemLabels(dataset),
-          multiple = TRUE)
+        shiny::selectizeInput('colsLHS', NULL, itemLabels, multiple = TRUE)
       })
       
       output$choose_rhs <- shiny::renderUI({
-        shiny::selectizeInput('colsRHS',NULL,
-          itemLabels(dataset),
-          multiple = TRUE)
+        shiny::selectizeInput('colsRHS', NULL, itemLabels, multiple = TRUE)
       })
       
       #output$logOutput <- shiny::renderText({
