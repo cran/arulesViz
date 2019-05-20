@@ -1,7 +1,15 @@
+# arulesViz 1.3-3 (05/20/2019)
+
+## New features
+*arulesViz_1.3-2.1.tar.gz ruleExplorer got a cleaner interface and several new features.
+
+## Bug Fix
+* plot with method "paracoord" works now also with a single item in the LHS. 
+
 # arulesViz 1.3-2 (12/04/2018)
 
 ## Bug Fix
-* ruleExplorer now checks for excessive number of items so shiny does not freeze.
+* ruleExplorer now checks for an excessive number of items so shiny does not freeze.
 * plot with method matrix: control option reorder = "similarity" works now again.
 
 # arulesViz 1.3-1 (04/23/2018)
