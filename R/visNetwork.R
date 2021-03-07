@@ -101,7 +101,7 @@ visNetwork_arules <- function(x, measure = "support", shading = "lift",
     color <- c(rep(control$itemCol[1], length(itemNodes)),
       .col_picker(map(s, c(0.9,0.1)), control$nodeCol)) 
         ## alpha not supported alpha=control$alpha)) 
-  } else v.color <- c(rep(control$itemCol[1], length(itemNodes)),
+  } else color <- c(rep(control$itemCol[1], length(itemNodes)),
     .col_picker(rep(.5, length(x)), control$nodeCol)) 
       ## alpha=control$alpha))
 
@@ -122,10 +122,10 @@ visNetwork_arules <- function(x, measure = "support", shading = "lift",
     #,
     #color = control$edgeCol)
   
-  visNetwork(nodes = nodes, edges = edges) %>% 
-    visNodes(scaling = list(label = list(enabled = TRUE))) %>%
-    visIgraphLayout(layout = control$igraphLayout) %>%
-    visOptions(highlightNearest = 
+  visNetwork::visNetwork(nodes = nodes, edges = edges) %>% 
+    visNetwork::visNodes(scaling = list(label = list(enabled = TRUE))) %>%
+    visNetwork::visIgraphLayout(layout = control$igraphLayout) %>%
+    visNetwork::visOptions(highlightNearest = 
         list(enabled = TRUE, degree = control$degree_highlight, hover = TRUE), 
       nodesIdSelection = control$selection_menu
       )

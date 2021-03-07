@@ -32,8 +32,7 @@ plot.rules <- function(x, method = NULL,
     "scatterplot",	## standard
     "grouped matrix",
     "two-key plot",
-    "matrix3D",
-    "iplots"
+    "matrix3D"
   )
   
   if(length(x)<1) stop("x contains 0 rules!")
@@ -41,19 +40,20 @@ plot.rules <- function(x, method = NULL,
   if(is.null(method)) methodNr <- 6
   else methodNr <- pmatch(tolower(method), tolower(methods))
   if(is.na(methodNr)) stop (paste("Unknown method:",sQuote(method), "\nAvailable methods:", paste(sQuote(methods), collapse = ", ")))
+  
+  ## add order
+  quality(x)$order <- size(x)
  
   ## complete measure and shading
-  mid <- pmatch(measure, colnames(quality(x)))
+  mid <- pmatch(measure, colnames(quality(x)), duplicates.ok = TRUE)
   if(any(is.na(mid))) stop("Measure not available in rule set: ", 
     paste(sQuote(measure[is.na(mid)]), collapse = ", "))
   measure <- colnames(quality(x))[mid]
 
-  ### NA means no shading & add order  
-  quality(x)$order <- size(x)
+  ## NA means no shading
   if(!all(is.na(shading))) {
     sid <- pmatch(shading, colnames(quality(x)))
-    if(any(is.na(sid))) stop("Shading measure not available in rule set: ", 
-      paste(sQuote(shading[is.na(sid)]), collapse = ", "))
+    if(any(is.na(sid))) stop("Shading measure not available in rule set: ",       paste(sQuote(shading[is.na(sid)]), collapse = ", "))
     shading <- colnames(quality(x))[sid]
   }
    
@@ -88,7 +88,6 @@ plot.rules <- function(x, method = NULL,
     shading = shading, control=control, ...)
   else if (methodNr == 8) { 
     if(is.null(control$col)) control$col <- rainbow(max(size(x))-1L)
-    if(is.null(control$main)) control$main <- "Two-key plot"
     scatterplot_arules(x, 
     measure = c("support", "confidence"), shading = "order", 
     control, ...)
@@ -97,11 +96,6 @@ plot.rules <- function(x, method = NULL,
     warning("method 'matrix3D' is deprecated use method 'matrix' with engine '3d'")
     control$engine <- "3d"
     matrix_arules(x, measure = shading, control = control, ...)
-  }
-  else if (methodNr == 10) {
-    if(length(measure)<2) measure[2] <- "confidence"
-    iplot_arules(x, measure = measure, 
-      shading=shading, data=data, control=control, ...)
   }
 }
 

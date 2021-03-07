@@ -1,5 +1,4 @@
 ### R code from vignette source 'arulesViz.Rnw'
-### Encoding: UTF-8
 
 ###################################################
 ### code chunk number 1: arulesViz.Rnw:75-76

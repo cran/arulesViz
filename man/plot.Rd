@@ -4,6 +4,7 @@
 \alias{plot.itemsets}
 \alias{plot.rules}
 \alias{plot.grouped_matrix}
+\alias{plotly}
 \title{Visualize Association Rules and Itemsets}
 \description{
 Methods (S3) to visualize association rules and itemsets.
@@ -26,14 +27,14 @@ and interactive HTML widget-based visualizations.
   \item{x}{ an object of class "rules" or "itemsets". }
   \item{method}{ a string with value "scatterplot", "two-key plot", "matrix", 
   "matrix3D",  "mosaic", 
-  "doubledecker", "graph", "paracoord" or "grouped", "iplots" selecting the 
+  "doubledecker", "graph", "paracoord" or "grouped" selecting the 
   visualization method (see Details). Note that some methods may only be  available for rules or itemsets.}
   
   \item{measure}{ measure(s) of interestingness 
   (e.g., "support", "confidence", "lift", "order") used in the visualization. Some 
   visualization methods need one measure, others take a vector with two 
   measures (e.g., scatterplot). In some plots (e.g., graphs) \code{NA} 
-  can be used to suppress using a measure. }
+  can be used to suppress using a measure. See Details Section.}
   
   \item{shading}{ measure of interestingness used
   for the color of the points/arrows/nodes
@@ -51,13 +52,13 @@ and interactive HTML widget-based visualizations.
   
   \item{engine}{ a string indicating the plotting engine used to 
     render the plot. 
-    The "default" engine uses (mostly) \pkg{grid}, 
-    but some plots can produce interactive 
-    interactive grid visualizations using engine "interactive", or
-    HTML widgets using engine 
-    "htmlwidget". These widgets can be saved as stand-alone web pages 
-    (see Examples). Note that HTML widgets tend to get very slow 
-    or unresponsive for 
+    The "default" engine uses (mostly) \pkg{grid}.
+    Other engines include "base" (base R plots), 
+    "ggplot2", "interactive", "plotly", "viznetwork", "igraph", "graphviz".
+    Note that not all engines are available for all methods.
+    The engine "htmlwidget" uses an appropriate engine to create a 
+    widget that can be included in markdown documents and web pages (see Examples). 
+    Note that HTML widgets tend to get very slow or unresponsive for 
     too many rules. To prevent this situation, the control parameter 
     \code{max} sets a limit, and the user is warned if the limit is reached. 
   }
@@ -130,7 +131,7 @@ can be any function computing a scalar from a vector
 to reorder the balloons in the plot.}
 \item{"col"}{color palette (default is 100 heat colors.)}
 \item{"gp_labels", "gp_main", "gp_labs", "gp_lines"}{\code{gpar()} objects used to specify color, font and font size for
-    different elements.}
+    different elements. Note: You need load \pkg{grid} to use \code{gpar()}.}
 }
 }
 
@@ -158,13 +159,6 @@ Represents the rules (or itemsets) as a parallel coordinate plot.
 Currently there is no interactive version available.
 }
 
-\item{"iplots"}{
-Experimental interactive plots (package \pkg{iplots}) 
-which support selection, highlighting, 
-brushing, etc. Currently plots a scatterplot (support vs. confidence) and
-several histograms. Interactive manipulations are available. 
-}
-
 }
 }
 \value{
@@ -177,19 +171,19 @@ Michael Hahsler and Sudheer Chelluboina. Some visualizations are based on
 the implementation by Martin Vodenicharov.
 }
 \references{
+Hahsler M (2017). arulesViz: Interactive Visualization of Association
+Rules with R. \emph{R Journal,} 9(2):163-175. ISSN 2073-4859. \doi{10.32614/RJ-2017-047}.
+    
 Bruzzese, D. and Davino, C. (2008), Visual Mining of Association Rules, in
 Visual Data Mining: Theory, Techniques and Tools for Visual Analytics,
-Springer-Verlag, pp. 103-122.
+Springer-Verlag, pp. 103-122. \doi{10.1007/978-3-540-71080-6}
 
-Hahsler, M. and Karpienko, R. (2016), Visualizing Association Rules in Hierarchical Groups. \emph{Journal of Business Economics,} 87(3):17-335, May 2016
+Hahsler, M. and Karpienko, R. (2016), Visualizing Association Rules in Hierarchical Groups. \emph{Journal of Business Economics,} 87(3):17-335. \doi{10.1007/s11573-016-0822-8}
 
 Hahsler, M. (2016), Grouping association rules using lift. In C. Iyigun, R. Moghaddess, and A. Oztekin, editors, 11th INFORMS Workshop on Data Mining and Decision Analytics (DM-DA 2016).
-
-Hahsler, M. (2017), arulesViz: Visualizing association rules with R. \emph{R Journal,} 9(2):163-175, December 2017.
 }
 
 \seealso{
-\code{\link{plotly_arules}},
 \code{\link[scatterplot3d]{scatterplot3d}} in \pkg{scatterplot3d},
 \code{\link[igraph]{plot.igraph}} and
 \code{\link[igraph]{tkplot}} in \pkg{igraph},
@@ -210,9 +204,21 @@ plot(rules, control = list(col=sequential_hcl(100)))
 plot(rules, col=sequential_hcl(100))
 plot(rules, col=grey.colors(50, alpha =.8))
 
+## Scatterplot with custom measures
+plot(rules, measure = c("support", "lift"), shading = "confidence")
+
 ## See all control options using verbose
 plot(rules, verbose = TRUE)
 
+## Use engine ggplot2
+library(ggplot2)
+plot(rules, engine = "ggplot2")
+plot(rules, engine = "ggplot2") + 
+  scale_color_gradient2(low = "red", mid = "white", high = "blue", 
+    midpoint = 1, limits = c(0,12)) +
+  ggtitle("Scatterplot") +
+  theme_linedraw()
+  
 ## Interactive plot (selected rules are returned)
 \dontrun{
 sel <- plot(rules, engine = "interactive")}
@@ -252,13 +258,16 @@ plot(subrules, method="matrix", control = list(reorder = "similarity"))
 plot(subrules, method="matrix", engine="interactive")
 plot(subrules, method="matrix", engine="htmlwidget")}
 
+## ggplot2 matrix plot
+plot(subrules, method="matrix", engine = "ggplot2") +
+  theme_linedraw()
+
 ## Grouped matrix plot
 ## -------------------
-
 plot(rules, method="grouped matrix")
 plot(rules, method="grouped matrix", 
   col = grey.colors(10), 
-  gp_labels = gpar(col = "blue", cex=1, fontface="italic"))
+  gp_labels = grid::gpar(col = "blue", cex=1, fontface="italic"))
 
 ## Interactive grouped matrix plot
 \dontrun{
@@ -275,6 +284,19 @@ plot(subrules2, method="graph")
 ## Custom colors
 plot(subrules2, method="graph", 
   nodeCol = grey.colors(10), edgeCol = grey(.7), alpha = 1)
+
+## no shading for lift, set node color to grey and add 
+## labels for support
+plot(subrules2, method="graph", shading = NA, nodeCol = grey(.5), measureLabels = TRUE)
+
+## use plot_options to alter any aspect of the graph 
+## (see: https://igraph.org/r/doc/plot.common.html)
+plot(subrules2, method="graph", 
+  plot_options = list(
+    edge.lty = 2, 
+    vertex.label.cex = .6, 
+    margin = c(.1,.1,.1,.1), 
+    asp = .5))
 
 ## igraph layout generators can be used (see ? igraph::layout_)
 plot(subrules2, method="graph", layout=igraph::in_circle())

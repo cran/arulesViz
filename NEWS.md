@@ -1,7 +1,22 @@
+# arulesViz 1.4-0 (03/05/2021)
+
+## New features
+* plot methods "scatterplots" and "matrix" have now engine ggplot2. 
+
+## Removed functions
+* cleaned namespace. E.g., grid is now an import (instead of a dependency).
+* plotly_arules was removed from the interface. Use plot with engine "plotly" or "htmlwidget."
+* experimental support for iplots was removed.
+
+## Bug Fixes
+* fixed bug that prevented shading = NA in plotting method graph.
+* fixed some control parameter handling and added more example for plot method graph.
+* fixed additional item shown in LHS for grouped matrix plot (reported by Tasos Fasoulis).
+
 # arulesViz 1.3-3 (05/20/2019)
 
 ## New features
-*arulesViz_1.3-2.1.tar.gz ruleExplorer got a cleaner interface and several new features.
+* ruleExplorer got a cleaner interface and several new features.
 
 ## Bug Fix
 * plot with method "paracoord" works now also with a single item in the LHS. 
