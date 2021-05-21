@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ scatterplot_ggplot2 <- function(x,
   
   control <- c(control, list(...))  
   control <- .get_parameters(control, list(
+    main = paste("Scatter plot for", length(x), class(x)),
     colors = default_colors(2), 
     jitter = NA,
     engine = "ggplot2"
@@ -55,11 +56,12 @@ scatterplot_ggplot2 <- function(x,
   jitter <- jitter[1]
   if(is.na(jitter) && any(duplicated(q[,measure]))) {
     message("To reduce overplotting, jitter is added! Use jitter = 0 to prevent jitter.")   
-    jitter <- .1
+    jitter <- .jitter_default
   }
   
   if(!is.na(jitter) && jitter>0) 
-    for(m in measure) q[[m]] <- jitter(q[[m]], factor = jitter)
+    for(m in measure) 
+      if(is.numeric(q[[m]])) q[[m]] <- jitter(q[[m]], factor = jitter, amount = 0)
 
   if(is.na(shading)) shading <- NULL
   p <- ggplot(q, aes_string(measure[1], y = measure[2], color = shading)) +
@@ -71,7 +73,8 @@ scatterplot_ggplot2 <- function(x,
     else
       p <- p + scale_color_discrete()
   }
-  p
+  
+  p + ggtitle(control$main) + theme_linedraw()
   
 }
 
@@ -80,6 +83,7 @@ matrix_ggplot2 <- function(x,
   
   control <- c(control, list(...))  
   control <- .get_parameters(control, list(
+    main = paste("Matrix for", length(x), "rules"),
     colors = default_colors(2), 
     reorder = "measure",
     max = 1000,
@@ -88,77 +92,129 @@ matrix_ggplot2 <- function(x,
   
   colors <- rev(control$colors)
   
-  q <- quality(x)
-  q[["order"]] <- size(x) 
-  qnames <- names(q)
-  measure <- qnames[pmatch(measure, qnames, duplicates.ok = TRUE)]
-  shading <- qnames[pmatch(shading, qnames)]
-
-  if(length(x) > control$max) {
-    warning("plot: Too many rules supplied. Only plotting the best ", 
-      control$max, " rules using ", measure, " (change parameter max if needed)", 
-      call. = FALSE)
-    x <- tail(x, n = control$max, by = measure, decreasing = FALSE)
-  }
- 
-  measure <- measure[1]
-  cat(measure) 
+  m <- rules2matrix(x, measure, control$reorder)
   
+  # reverse rows so highest value is in the top-left hand corner
+  m <- m[nrow(m):1, ]
   
-  m <- rulesAsMatrix(x, measure = measure)
-  m_s <- rulesAsMatrix(x, "support")
-  m_c <- rulesAsMatrix(x, "confidence")
-  
-  reorderTypes <- c("none", "measure", "support/confidence", "similarity")
-  reorderType <- pmatch(control$reorder , reorderTypes, nomatch = 0)
-  if(reorderType == 0) stop("Unknown reorder method: ", sQuote(control$reorder), 
-    " Valid reorder methods are: ", paste(sQuote(reorderTypes), 
-      collapse = ", "))
-  if(reorderType == 2){
-    cm <- order(colMeans(m, na.rm = TRUE), decreasing = FALSE)
-    rm <- order(rowMeans(m, na.rm = TRUE), decreasing = FALSE)
-    m <- m[rm, cm]
-    m_s <- m_s[rm, cm]
-    m_c <- m_c[rm, cm]
-  } else if(reorderType == 3){
-    cm <- order(colMeans(m_s, na.rm = TRUE), decreasing = FALSE)
-    rm <- order(rowMeans(m_c, na.rm = TRUE), decreasing = FALSE)
-    m <- m[rm, cm]
-    m_s <- m_s[rm, cm]
-    m_c <- m_c[rm, cm]
-  } else if(reorderType == 4){
-    d <- dissimilarity(lhs(x), method = "jaccard")
-    cm <- get_order(seriate(d))
-    rm <- order(rowMeans(m, na.rm = TRUE), decreasing = FALSE)
-    m <- m[rm, cm]
-    m_s <- m_s[rm, cm]
-    m_c <- m_c[rm, cm]
-  } 
-
+  ## print labels
   writeLines("Itemsets in Antecedent (LHS)")
   print(colnames(m))
   writeLines("Itemsets in Consequent (RHS)")
   print(rownames(m))
   
-  # txt <- t(outer(colnames(m), rownames(m), paste, sep = '<BR>&nbsp;&nbsp; => '))
-  # txt[] <- paste('<B>', txt, '</B>', 
-  #   '<BR>',measure, ': ', signif(m, precision), 
-  #   '<BR>','support', ': ', signif(m_s, precision), 
-  #   '<BR>','confidence', ': ', signif(m_c, precision), 
-  #   sep = '')
-  # txt[is.na(m)] <- NA
- 
   dimnames(m) <- list(seq_len(nrow(m)), seq_len(ncol(m)))
-   
+  
   # NOTE: nullify variables used for non-standard evaluation for tidyverse/ggplot2 below
-  RHS <- LHS <- value <- NULL
+  RHS <- LHS  <- NULL
   
   d <- m %>% as_tibble() %>% dplyr::mutate(RHS = seq_len(nrow(m))) %>% 
-    pivot_longer(cols = -c(RHS), names_to = "LHS")  
+    pivot_longer(cols = -c(RHS), names_to = "LHS", values_to = measure)  
   d$LHS <- as.integer(d$LHS)
   
-  ggplot(d, aes_string(x = 'LHS', y = 'RHS', fill = 'value')) + geom_tile() +
-    scale_fill_gradient(low=colors[1], high=colors[2], na.value = 0) 
+  ggplot(d, aes_string(x = 'LHS', y = 'RHS', fill = measure)) + geom_raster() +
+    scale_fill_gradient(low=colors[1], high=colors[2], na.value = 0) +
+    ggtitle(control$main) + 
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    theme_bw()
 }
+
+grouped_matrix_ggplot2 <- function(x, 
+  measure = c("support"), shading = "lift", control = NULL, ...) {
+  
+  control <- c(control, list(...))  
+  control <- .get_parameters(control, list(
+    k = 20,
+    aggr.fun = mean, 
+    rhs_max = 10,
+    lhs_label_items = 2,
+    col = default_colors(2),
+    #max.shading = NA,
+    engine = "ggplot2"
+  ))
+  
+  # get the clustering
+  gm <- rules2groupedMatrix(x, shading, measure, 
+    k = control$k, aggr.fun = control$aggr.fun, lhs_label_items = control$lhs_label_items)  
+
+  m <- gm$m
+  m2 <- gm$m2
+  
+  not_shown_rhs <- 0
+  if(nrow(m) > control$rhs_max) {
+    not_shown_rhs <- nrow(m) - control$rhs_max
+    m <- m[seq_len(control$rhs_max), , drop = FALSE]
+    m2 <- m2[seq_len(control$rhs_max), , drop = FALSE]
+  }
+    
+  # convert to data.frame  
+  df <- data.frame(
+    LHS = rep(ordered(colnames(m), levels = colnames(m)), times = nrow(m)), 
+    RHS = rep(ordered(rownames(m), levels = rev(rownames(m))), each = ncol(m)), 
+    measure = as.vector(t(m)), 
+    support = as.vector(t(m2))
+  )
+
+  # NULLify for CRAN
+  LHS <- RHS <- NULL
+  
+  p <- ggplot(df, aes(x = LHS, y = RHS, size = support, color = measure)) +
+    geom_point(na.rm = TRUE) + 
+    scale_color_gradient(low = control$col[2], high = control$col[1]) + 
+    labs(color = shading) + 
+    xlab("Items in LHS Groups") + 
+    ylab(paste("RHS", if(not_shown_rhs > 0) paste('(+', not_shown_rhs, ' not shown)', sep = '') else '')) +
+    theme_linedraw() +
+    scale_x_discrete(position = "top") +
+    scale_y_discrete(position = "right") +
+    theme(axis.text.x=element_text(angle = 90, hjust = 0, vjust = .5), 
+      legend.position="bottom") +
+    scale_size(range = c(2, 8))
+        
+  if(control$engine == "htmlwidget") p <- plotly::ggplotly(p)
+  p
+}
+
+graph_ggplot2 <- function(x, measure = "support", shading = "lift", 
+  control = NULL, ...) {
+  
+  if(is.na(shading)) shading <- NULL
+  
+  ### NULLify stuff for CRAN
+  label <- y <- xend <- yend <- NULL
+  
+  control <- c(control, list(...))  
+  control <- .get_parameters(control, list(
+    #main = paste("Graph for", length(x), "rules"),
+    layout = igraph::nicely(),
+    edges = ggnetwork::geom_edges(color = "grey80", 
+      arrow = arrow(length = unit(6, "pt"), type = "closed"), alpha = .7),
+    nodes = ggnetwork::geom_nodes(aes_string(size = measure, color = shading), na.rm = TRUE),
+    nodetext = ggnetwork::geom_nodetext(aes(label = label)),
+    colors = default_colors(2), 
+    engine = "ggplot2", 
+    max = 100
+  ))
+  
+  if(length(x) > control$max) {
+    warning("Too many rules supplied. Only plotting the best ", 
+      control$max, " rules using ", shading, 
+      " (change control parameter max if needed)", call. = FALSE)
+    x <- tail(x, n = control$max, by = shading, decreasing = FALSE)
+  }
+  
+  
+  g <- associations2igraph(x)
+  n <- ggnetwork::fortify(g, layout = control$layout)
+  
+  ggplot(n, aes(x = x, y = y, xend = xend, yend = yend)) +
+    control$edges +
+    control$nodes +
+    control$nodetext + 
+    scale_color_gradient(low = control$colors[2], high = control$colors[1], na.value = 0) +
+    ggnetwork::theme_blank()
+}
+
 
 

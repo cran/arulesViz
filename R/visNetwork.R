@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 # FIXME: Implement max
 # FIXME: size and color...
 
-visNetwork_arules <- function(x, measure = "support", shading = "lift", 
+graph_visNetwork <- function(x, measure = "support", shading = "lift", 
   control=NULL, ...) {
   
   if(class(x) != "rules") stop("Only implemented for rules!")
@@ -29,29 +29,15 @@ visNetwork_arules <- function(x, measure = "support", shading = "lift",
   
   control <- .get_parameters(control, list(
     #main = paste("Graph for", length(x), "rules"),
-    #nodeColors = .nodeColors(
-    #  if(!is.null(control$alpha)) control$alpha else .5),
-    itemCol = hcl(h = 260),
+    itemCol = grDevices::hcl(h = 260),
     nodeCol = default_colors(100, alpha = 0),
-    #edgeCol = grey_hcl(1, alpha = 0),
-    #alpha = .5,
-    #cex = 1,
-    #itemLabels = TRUE,
-    #labelCol = hcl(l=0, alpha = .7),
-    #measureLabels = FALSE,
     precision = 3,
-    #type = "items",
-    #layout = NULL,
     igraphLayout = "layout_nicely",
-    #layoutParams = list(),
-    #arrowSize = .5,
     interactive = TRUE,
     engine = "visNetwork", 
     max = 100,
     selection_menu = TRUE,
     degree_highlight =1
-    #,
-    #plot = TRUE
   ))
   
   if(length(x) > control$max) {
@@ -71,7 +57,6 @@ visNetwork_arules <- function(x, measure = "support", shading = "lift",
   ruleNodes <- paste("r", 1:length(x), sep='')
   
   nodeLabels <- c(itemLabels(x)[itemNodes], paste("rule", 1:length(ruleNodes)))
-  #nodeLabels <- c(itemLabels(x)[itemNodes], rep("", length(ruleNodes)))
   
   allNodes <- factor(c(itemNodes, ruleNodes), levels = c(itemNodes, ruleNodes))
   nodeType <- c(rep("item", length(itemNodes)), rep("rule", length(ruleNodes)))
@@ -100,10 +85,8 @@ visNetwork_arules <- function(x, measure = "support", shading = "lift",
     s <- quality(x)[[shading]]
     color <- c(rep(control$itemCol[1], length(itemNodes)),
       .col_picker(map(s, c(0.9,0.1)), control$nodeCol)) 
-        ## alpha not supported alpha=control$alpha)) 
   } else color <- c(rep(control$itemCol[1], length(itemNodes)),
     .col_picker(rep(.5, length(x)), control$nodeCol)) 
-      ## alpha=control$alpha))
 
   nodes <- data.frame(
     id = as.integer(allNodes), 
@@ -119,8 +102,6 @@ visNetwork_arules <- function(x, measure = "support", shading = "lift",
     from = c(from_lhs, from_rhs), 
     to = c(to_lhs, to_rhs), 
     arrows = "to") 
-    #,
-    #color = control$edgeCol)
   
   visNetwork::visNetwork(nodes = nodes, edges = edges) %>% 
     visNetwork::visNodes(scaling = list(label = list(enabled = TRUE))) %>%

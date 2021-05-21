@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,39 +16,100 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+.jitter_default <- 1
 
-scatterplot_arules <- function(rules, measure = c("support","confidence"), 
+scatterplot <- function(x, measure = c("support","confidence"), 
   shading = "lift", control = NULL, ...){
   
-  control <- c(control, list(...))  
-
-  engines <- c("default", "ggplot2", "interactive", "plotly", "htmlwidget")
+  engines <- c("default", "ggplot2", "base", "grid", "interactive", "plotly", "htmlwidget")
+  if(control$engine == "help") {
+    message("Available engines for this plotting method are:\n", paste0(engines, collapse = ", "))
+    return(invisible(engines))  
+  }
+  
   m <- pmatch(control$engine, engines, nomatch = 0)
   if(m == 0) stop("Unknown engine: ", sQuote(control$engine), 
     " Valid engines: ", paste(sQuote(engines), collapse = ", "))
   control$engine <- engines[m] 
-    
-  if(pmatch(control$engine, c("plotly", "htmlwidget"), nomatch = 0) >0) { 
-    return(scatterplot_plotly(rules, measure = measure,
-      shading = shading, control = control)) ### control has max
-  }
-
-  if(pmatch(control$engine, c("ggplot2"), nomatch = 0) >0) { 
-    return(scatterplot_ggplot2(rules, measure = measure,
-      shading = shading, control = control)) ### control has max
+  
+  if(pmatch(control$engine, c("base"), nomatch = 0) >0) { 
+    return(scatterplot_base(x, measure = measure,
+      shading = shading, control = control, ...))
   }
   
-  return(scatterplot_grid(rules, measure = measure,
-    shading = shading, control = control))
+  if(pmatch(control$engine, c("grid", "interactive"), nomatch = 0) >0) { 
+    return(scatterplot_grid(x, measure = measure,
+      shading = shading, control = control, ...))
+  }
+    
+  if(pmatch(control$engine, c("plotly", "htmlwidget"), nomatch = 0) >0) { 
+    return(scatterplot_plotly(x, measure = measure,
+      shading = shading, control = control, ...)) ### control has max
+  }
+
+  ### default is ggplot2 
+  return(scatterplot_ggplot2(x, measure = measure,
+      shading = shading, control = control, ...)) ### control has max
+  
 }   
 
+### FIXME: specify colors for rules manually
+scatterplot_base <- function(x, measure = c("support","confidence"), 
+  shading = "lift", control = NULL, ...){
+  
+  addl <- list(...)
+  
+  control <- .get_parameters(control, list(
+    main = paste("Scatter plot for", length(x), class(x)),
+    engine = "base",
+    pch = 19,
+    col = default_colors(100),
+    jitter = NA,
+    verbose = addl$verb
+  ))
+  
+  ## take control parameters from ...
+  o <- pmatch(names(addl), names(control))
+  control[o[!is.na(o)]] <- addl[!is.na(o)]
+  addl[!is.na(o)] <- NULL
+  
+  q <- quality(x)
+  q$order <- size(x)
+  col <- rev(control$col)
+  
+  ## shading
+  if(!is.na(shading)) {
+    ## reduce overplotting
+    q <- q[order(q[[shading]]),]
+    
+    rank <- as.integer(cut(q[[shading]], length(col)))
+    col <- col[rank]
+  } else col <- 1
+  
+  ## jitter
+  qq <- q[measure]
+  
+  control$jitter <- control$jitter[1]
+  if(is.na(control$jitter) && any(duplicated(qq))) {
+    message("To reduce overplotting, jitter is added! Use jitter = 0 to prevent jitter.")
+    control$jitter <- .jitter_default
+  }
+  
+  if(!is.na(control$jitter) && control$jitter>0) {
+    qq[,1] <- jitter(qq[,1], factor=control$jitter, amount = 0)
+    qq[,2] <- jitter(qq[,2], factor=control$jitter, amount = 0)
+  }
+  
+  do.call(plot, c(list(x = qq, pch = control$pch, col = col, main = control$main), addl))
+}
 
 
 scatterplot_grid <- function(rules, measure = c("support","confidence"), 
   shading = "lift", control = NULL, ...){
   
+  control <- c(control, list(...))  
   control <- .get_parameters(control, list(
-    main =paste("Scatter plot for", length(rules), class(rules)),
+    main = paste("Scatter plot for", length(rules), class(rules)),
     engine = "default",
     pch = 19,
     cex = .5,
@@ -57,9 +118,6 @@ scatterplot_grid <- function(rules, measure = c("support","confidence"),
     zlim = NULL,
     alpha = NULL,
     col = default_colors(100),
-    #col = hcl(c=0, l=seq(10,80, length.out=100)),
-    #col = heat_hcl(100),
-    #gray_range = c(.1,.8),
     newpage = TRUE,
     jitter = NA
   ))
@@ -143,7 +201,7 @@ scatterplot_grid <- function(rules, measure = c("support","confidence"),
           if(is.null(control$xlim)) control$xlim <- range(q[,1])
           if(is.null(control$ylim)) control$ylim <- range(q[,2])
           
-          ret <- scatterplot_arules(sel_r, measure, 
+          ret <- scatterplot_grid(sel_r, measure, 
             shading, control)
           if(!identical(ret, "zoom out")) return(ret)
           
@@ -188,7 +246,7 @@ scatterplot_grid <- function(rules, measure = c("support","confidence"),
       control$xlim <- NULL
       control$ylim <- NULL
       
-      ret <- scatterplot_arules(sel_r, measure, 
+      ret <- scatterplot_grid(sel_r, measure, 
         shading, control)
       if(!identical(ret, "zoom out")) return(ret)
       
@@ -233,7 +291,7 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
   ## reverse colors
   colors <- rev(control$col)
   
-  q <- quality(rules)[, na.omit(c(measure, shading))]
+  q <- quality(rules)[, stats::na.omit(c(measure, shading))]
   
   ## handle Inf
   for(i in 1:ncol(q)) {
@@ -275,7 +333,6 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
       min_size <- min(q$order)
       steps <- (max_size-min_size)+1
       ypos <- rev((1:steps -.5)/steps)
-      #col <- gray(map(min_size:max_size, control$gray_range))
       col <- colors[map_int(min_size:max_size, c(1,length(colors)))]
       grid.points(x=rep(0,steps), 
         y=ypos, pch=control$pch,
@@ -290,7 +347,6 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
         
         gColorkey(range_shading,
           colors,
-          #gray(1-map(1:20, control$gray_range)),
           name="colorkey", label=shading)
       }else{
         grid.text(paste(shading, "=", 
@@ -319,7 +375,7 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
   control$jitter <- control$jitter[1]
   if(is.na(control$jitter) && any(duplicated(x))) {
     message("To reduce overplotting, jitter is added! Use jitter = 0 to prevent jitter.")
-    control$jitter <- .2
+    control$jitter <- .jitter_default
   }
   
   if(!is.na(control$jitter) && control$jitter>0) {
@@ -330,14 +386,8 @@ scatterplot_int <- function(rules, measure, shading, control, ...){
   
   ## get colors for shading
   if(!is.na(shading)) {
-    #col <- 1-map(q[[shading]], 
-    #	control$gray_range, from.range=range_shading)
     col <- colors[map_int(q[[shading]], 
       c(1,length(colors)), from.range=range_shading)]
-    ## not in range!
-    #x[is.na(col),] <- c(NA,NA) 
-    #col[is.na(col)] <- 1
-    #col <- gray(col)
     
   }else col <- 1
   

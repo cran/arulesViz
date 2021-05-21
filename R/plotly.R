@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,53 +18,11 @@
 
 # plotly interactive plots using d3.js
 
-
-plotly_arules <- function(x, method = "scatterplot", 
-  measure = c("support", "confidence"), shading = "lift", 
-  max = 1000, ...) {
-  
-  .Deprecated("plot")
-
-  .plotly_arules(x, method, measure, shading, 1000, ...)
-}
-
-.plotly_arules <- function(x, method = "scatterplot", 
-  measure = c("support", "confidence"), shading = "lift", 
-  max = 1000, ...) {
-  
-  if(!is(x, "associations")) stop("x has to be a set of rules.")
-  
-  methods <- c("scatterplot", "two-key plot", "matrix")
-  
-  if(length(x)<1) stop("x contains 0 rules!")
-  
-  if(is.null(method)) methodNr <- 1
-  else methodNr <- pmatch(tolower(method), tolower(methods))
-  if(is.na(methodNr)) stop (paste("Unknown method:",sQuote(method)))
-  
-  # two-key plot is a scatterplot with order shading
-  if(methodNr==2) {
-    shading <- "order"
-    methodNr <- 1
-  }
-  
-  #quality(x)[["order"]] <- size(x) 
-  qnames <- names(quality(x))
-  measure <- qnames[pmatch(measure, qnames, duplicates.ok = TRUE)]
-  shading <- qnames[pmatch(shading, qnames)]
-  
-  if(methodNr == 1) 
-    .plotly_scatter(x, measure, shading, max = max, ...)
-  else 
-    .plotly_matrix(x, shading, max = max, ...)
-}
-
 ## Interface used by plot
 scatterplot_plotly <- function(x,
   measure = measure, shading = shading, control = control, ...) {
   
-  control <- c(control, list(...))  
-  
+  control <- c(control, list(...))
   control <- .get_parameters(control, list(
     interactive = TRUE,
     engine = "htmlwidget",
@@ -136,11 +94,11 @@ scatterplot_plotly <- function(x,
   jitter <- jitter[1]
   if(is.na(jitter) && any(duplicated(q[,measure]))) {
     message("To reduce overplotting, jitter is added! Use jitter = 0 to prevent jitter.")   
-    jitter <- .1
+    jitter <- .jitter_default
   }
   
   if(!is.na(jitter) && jitter>0) 
-    for(m in measure) q[[m]] <- jitter(q[[m]], factor = jitter)
+    for(m in measure) q[[m]] <- jitter(q[[m]], factor = jitter, amount = 0)
 
   if(is.na(shading)) 
     p <- plotly::plot_ly(q, type = "scatter", x = q[,measure[1]], y = q[,measure[2]], 
@@ -169,11 +127,9 @@ scatterplot_plotly <- function(x,
     )
 }
 
-## interface for plot
 matrix_plotly <- function(x, measure, shading, control, ...) {
   
   control <- c(control, list(...))  
-  
   control <- .get_parameters(control, list(
     interactive = TRUE,
     engine = "htmlwidget",
@@ -187,10 +143,10 @@ matrix_plotly <- function(x, measure, shading, control, ...) {
   measure <- qnames[pmatch(measure, qnames, duplicates.ok = TRUE)]
   
   .plotly_matrix(x, measure[1], reorder = control$reorder, 
-    colors = control$colors, precision = control$precision, max = control$max) }
+    colors = control$colors, precision = control$precision, max = control$max) 
+}
 
 .plotly_matrix <- function(x, measure = "lift", reorder = "none", 
-  #colors = colorRamp(c("grey", "red"))) {
   colors = default_colors(2), precision = 3, max = 1000) {
   
   colors <- rev(colors)
@@ -202,40 +158,14 @@ matrix_plotly <- function(x, measure, shading, control, ...) {
     x <- tail(x, n = max, by = measure, decreasing = FALSE)
   }
   
-  m <- rulesAsMatrix(x, measure = measure, itemSep= ',<BR>&nbsp;&nbsp;', 
-    setStart = '<B>{', setEnd = '}</B>')
-  m_s <- rulesAsMatrix(x, "support")
-  m_c <- rulesAsMatrix(x, "confidence")
-  
-  reorderTypes <- c("none", "measure", "support/confidence", "similarity")
-  reorderType <- pmatch(reorder , reorderTypes, nomatch = 0)
-  if(reorderType == 0) stop("Unknown reorder method: ", sQuote(reorder), 
-    " Valid reorder methods are: ", paste(sQuote(reorderTypes), 
-      collapse = ", "))
-  if(reorderType == 2){
-    cm <- order(colMeans(m, na.rm = TRUE), decreasing = FALSE)
-    rm <- order(rowMeans(m, na.rm = TRUE), decreasing = FALSE)
-    m <- m[rm, cm]
-    m_s <- m_s[rm, cm]
-    m_c <- m_c[rm, cm]
-  } else if(reorderType == 3){
-    cm <- order(colMeans(m_s, na.rm = TRUE), decreasing = FALSE)
-    rm <- order(rowMeans(m_c, na.rm = TRUE), decreasing = FALSE)
-    m <- m[rm, cm]
-    m_s <- m_s[rm, cm]
-    m_c <- m_c[rm, cm]
-  } else if(reorderType == 4){
-    d <- dissimilarity(lhs(x), method = "jaccard")
-    cm <- get_order(seriate(d))
-    rm <- order(rowMeans(m, na.rm = TRUE), decreasing = FALSE)
-    m <- m[rm, cm]
-    m_s <- m_s[rm, cm]
-    m_c <- m_c[rm, cm]
-  } 
-
-  
+  m <- rules2matrix(x, measure, reorder)
+  m <- m[nrow(m):1, , drop = FALSE] # reverse rows
+  m_s <- rules2matrix(x, measure = "support", reorder = "none")[rownames(m), colnames(m)]
+  m_c <- rules2matrix(x, measure = "confidence", reorder = "none")[rownames(m), colnames(m)]
+   
   txt <- t(outer(colnames(m), rownames(m), paste, sep = '<BR>&nbsp;&nbsp; => '))
-  txt[] <- paste('<B>', txt, '</B>', 
+  txt[] <- paste(
+    '<B>', txt, '</B>', 
     '<BR>',measure, ': ', signif(m, precision), 
     '<BR>','support', ': ', signif(m_s, precision), 
     '<BR>','confidence', ': ', signif(m_c, precision), 
@@ -250,13 +180,7 @@ matrix_plotly <- function(x, measure, shading, control, ...) {
     hoverinfo = 'text',
     text = txt
   ) %>% 
-    plotly::layout(xaxis=list(title="LHS", showticklabels = FALSE, 
-      showgrid = TRUE, ticks = ""), 
-      yaxis=list(title="RHS", showticklabels = FALSE, 
-        showgrid = TRUE, ticks = "")
-      #,margin=list(l=200, autoexpand=TRUE)
-      #yaxis=list(title="RHS", showticklabels = FALSE, showgrid = FALSE)
+    plotly::layout(xaxis=list(title="LHS", showticklabels = FALSE, showgrid = TRUE, ticks = ""), 
+      yaxis=list(title="RHS", showticklabels = FALSE, showgrid = TRUE, ticks = "")
     )
 }
-
-

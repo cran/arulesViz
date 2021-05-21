@@ -7,13 +7,13 @@
 Explore association rules using interactive manipulations and visualization using \pkg{shiny}.
 }
 \usage{
-ruleExplorer(x, parameter = NULL)
+ruleExplorer(x, sidebarWidth = 2, graphHeight = '600px')
 }
 \arguments{
   \item{x}{ a set of rules, a transactions object or a data.frame. } 
-  \item{parameter}{a list with parameters passed on to \code{\link[arules]{apriori}}. 
-    the list can be used to set the initial support and confidence thresholds.
-    Values are ignored if \code{x} contains a set of rules.}
+  \item{sidebarWidth}{ width of the sidebar as a number between 0 (= 0\% of the display width) and 
+  12 (= 100\% of the display width). }
+  \item{graphHeight}{ height of the plots in pixels. Increase if you have a larger/higher resolution display. }
 }
 %\details{}
 %\value{}
@@ -42,6 +42,7 @@ rules
 ruleExplorer(rules)
 
 # mine and explore rules on the fly
-ruleExplorer(Groceries)
+data(iris)
+ruleExplorer(iris)
 }
 }

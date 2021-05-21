@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,30 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-doubledecker_arules <- function(rules, measure ="support", data, 
+rules2table <- function(rules, data) {
+  antecedent <- unlist(LIST(lhs(rules), decode = FALSE))
+  consequent <- unlist(LIST(rhs(rules), decode = FALSE))
+  transactions <- data[, c(antecedent, consequent)]
+  ruleAsDataFrame <- as.data.frame(as(transactions, "matrix"))
+  for (i in 1:ncol(ruleAsDataFrame)) {
+    ruleAsDataFrame[[i]] <- factor(ruleAsDataFrame[[i]],
+      levels = c(FALSE, TRUE), labels = c("no", "yes"))
+  }
+  table(ruleAsDataFrame)
+}
+
+
+doubledeckerplot <- function(rules, measure ="support", data, 
 	control=list(), ...) {
 
-  if(pmatch(control$engine, c("default"), nomatch = 0) != 1) 
+  engines <- c("default")
+  
+  if(control$engine == "help") {
+    message("Available engines for this plotting method are:\n", paste0(engines, collapse = ", "))
+    return(invisible(engines))  
+  }
+  
+  if(pmatch(control$engine, engines, nomatch = 0) != 1) 
     stop("Unknown engine for scatterplot: '", control$engine, 
       "' Valid engines: 'default'.")
   
@@ -28,7 +48,6 @@ doubledecker_arules <- function(rules, measure ="support", data,
   if(is.null(data)) stop("data has to be specified, but is missing.")
 
   control <- c(control, list(...))
-
   control <- .get_parameters(control, list(
     main = "Doubledecker plot for 1 rule",
     type = "doubledecker",
@@ -39,7 +58,7 @@ doubledecker_arules <- function(rules, measure ="support", data,
 
   if(control$interactive) stop("No interactive visualization available for doubledecker/mosaic plot.")
     
-  table <- getTable(rules, data)
+  table <- rules2table(rules, data)
   
   if(control$type=="doubledecker")
     do.call(vcd::doubledecker, c(list(table, margins=c(2,8,length(dim(table) + 2), 2), 

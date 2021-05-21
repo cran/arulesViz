@@ -92,7 +92,7 @@ plot(subrules, method = "matrix", measure = "lift")
 ###################################################
 ### code chunk number 15: matrix3D1
 ###################################################
-plot(subrules, method = "matrix3D", measure = "lift")
+plot(subrules, method = "matrix", engine = "3d", measure = "lift")
 
 
 ###################################################
@@ -108,13 +108,13 @@ plot(rules, method = "grouped", control = list(k = 50))
 
 
 ###################################################
-### code chunk number 18: arulesViz.Rnw:747-748 (eval = FALSE)
+### code chunk number 18: arulesViz.Rnw:744-745 (eval = FALSE)
 ###################################################
 ## sel <- plot(rules, method = "grouped", interactive = TRUE)
 
 
 ###################################################
-### code chunk number 19: arulesViz.Rnw:771-772
+### code chunk number 19: arulesViz.Rnw:768-769
 ###################################################
 subrules2 <- head(rules, n = 10, by = "lift")
 
@@ -126,7 +126,7 @@ plot(subrules2, method = "graph")
 
 
 ###################################################
-### code chunk number 21: arulesViz.Rnw:816-817 (eval = FALSE)
+### code chunk number 21: arulesViz.Rnw:813-814 (eval = FALSE)
 ###################################################
 ## saveAsGraph(head(rules, n = 1000, by = "lift"), file = "rules.graphml")
 
@@ -144,7 +144,7 @@ plot(subrules2, method = "paracoord", control = list(reorder = TRUE))
 
 
 ###################################################
-### code chunk number 24: arulesViz.Rnw:916-918
+### code chunk number 24: arulesViz.Rnw:913-915
 ###################################################
 oneRule <- sample(rules, 1)
 inspect(oneRule)

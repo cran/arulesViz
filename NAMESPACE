@@ -1,31 +1,16 @@
 import("arules")
-
+import("grid") 
 import("ggplot2")
 import("tibble")
 import("tidyr")
-# dplyr has many NAMESPACE conflicts with arules so we use ::
+# NOTE: dplyr has many NAMESPACE conflicts with arules so we use ::
 #import("dplyr")
 
-import("grid") 
-
-importFrom("graphics", "par", "plot", "mtext", "text", "axis", "box")
-importFrom("stats", "median", "kmeans", "cutree", "dist", "hclust", "na.omit", "quantile")
-importFrom("grDevices", "hcl", "rgb", "gray.colors", "gray", "col2rgb",
-  "colorRampPalette", "rainbow")
+importFrom("graphics", "par", "mtext", "text", "axis", "box")
+importFrom("stats", "median")
 importFrom("methods", "is", "as", "new")
-importFrom("seriation", "seriate", "ser_permutation", "set_seriation_method",
-  "permute", "get_order")
 
-# we use :: for the following
-#importFrom("utils", "installed.packages", "write.csv")
-#import(igraph)
-#importFrom("scatterplot3d", "scatterplot3d")
-#importFrom("vcd", "mosaic", "doubledecker")
-#importFrom("colorspace", "heat_hcl", "sequential_hcl")
-#importFrom("plotly","plot_ly","layout")
-#importFrom("DT", "datatable", "formatRound")
-#importFrom("visNetwork", "visNetwork", "visIgraphLayout", "visOptions", "visNodes")
-
+importFrom("graphics", "plot")
 S3method(plot, rules)
 S3method(plot, itemsets)
 S3method(plot, grouped_matrix)
@@ -33,6 +18,12 @@ S3method(plot, grouped_matrix)
 export("inspectDT")
 S3method(inspectDT, rules)
 S3method(inspectDT, itemsets)
+S3method(inspectDT, data.frame)
 
-export("ruleExplorer")
-export("saveAsGraph")
+export(
+  "ruleExplorer", 
+  "saveAsGraph",
+  "associations2igraph", 
+  "rules2matrix", 
+  "rules2groupedMatrix"
+)

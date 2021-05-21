@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,17 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+### TODO: ggplot2 using ggally
 
-paracoord_arules <- function(x, measure= "support", shading = "lift", 
+paracoord_rules <- function(x, measure= "support", shading = "lift", 
   control=list(), ...) {
   
   ## remove short rules
   x <- x[size(x)>1]
   if(length(x)<1) stop("No rules of length 2 or longer.")
   
+  control <- c(control, list(...))
   control <- .get_parameters(control, list(
     main = paste("Parallel coordinates plot for", length(x), "rules"),
-    reorder = FALSE,
+    reorder = TRUE,
     interactive = FALSE,
     engine = "default",
     gp_labels = gpar(),
@@ -37,13 +39,18 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
     verbose = FALSE
   ))
   
-  if(pmatch(control$engine, c("default"), nomatch = 0) == 0)  
+  engines <- "default"
+  if(control$engine == "help") {
+    message("Available engines for this plotting method are:\n", paste0(engines, collapse = ", "))
+    return(invisible(engines))  
+  }
+  
+  if(pmatch(control$engine, engines, nomatch = 0) == 0)  
     stop("Unknown engine for parallel coordinates plot '", control$engine, 
       "' - Valid engine: 'default'.")
     
   if(control$interactive) stop("Interactive mode not available for parallel coordinates plot.")
    
-  
   ## sort rules to minimize occlusion
   x <- sort(x, by=shading,  decreasing = FALSE)
   lwd <- map(quality(x)[[measure]], c(1,5))
@@ -143,12 +150,11 @@ paracoord_arules <- function(x, measure= "support", shading = "lift",
 paracoord_items <- function(x, measure= "support", shading = NULL,
   control=list(), ...) {
  
-    control <- c(control, list(...))
-
+  control <- c(control, list(...))
   control <- .get_parameters(control, list(
     main =paste("Parallel coordinates plot for", 
       length(x), "itemsets"),
-    reorder = FALSE,
+    reorder = TRUE,
     engine = "default",
     interactive = FALSE,
     gp_labels = gpar(),
@@ -160,18 +166,14 @@ paracoord_items <- function(x, measure= "support", shading = NULL,
     stop("Unknown engine for parallel coordinates plot '", control$engine, 
       "' - Valid engine: 'default'.")
     
-  
   if(control$interactive) stop("Interactive mode not available for parallel coordinates plot.")
    
-  
-  
   ## remove single items
   x <- x[size(x)>1]
   
   ## sort to minimize occlusion
   x <- sort(x, by=measure,  decreasing = FALSE)
   lwd <- map(quality(x)[[measure]], c(1,5))
-  #col <- gray(map(quality(x)[[shading]], c(0.8,0.1)))
   col <- NULL 
   
   i <- LIST(items(x))
@@ -208,39 +210,11 @@ paracoord_items <- function(x, measure= "support", shading = NULL,
   gParacoords(m, xlab="Position", discreteNames = u, 
     col=col, lwd=lwd,
     gp_lines=gpar(alpha=control$alpha))
-  
 }
 
 
-#no use of this funtion can be deleted later
-makeMatrix <- function(l=NULL, r=NULL, u=NULL, control=NULL)
-{
-  maxLenLHS <- max(sapply(l, length))
-  pl <- t(sapply(l, FUN = function(x)  {
-    x <- match(x, u)
-    if(control$reorder) x <- sort(x, decreasing = TRUE)
-    length(x) <- maxLenLHS
-    rev(x) ## so NAs are to the left (we could also use na.last for sort)
-  }))
-  
-  ## RHS is always 1 for now
-  pr <- sapply(r, FUN = function(x)  match(x, u))
-  
-  m <- cbind(pl, pr)
-  colnames(m) <- c(ncol(pl):1, "rhs")
-  m
-}
-
-swap <- function(v=NULL, i=NULL, j=NULL)
-{
-  temp <- v[i]
-  v[i] <- v[j]
-  v[j] <- temp
-  v
-}
-
-countCrossovers <- function(m=NULL)
-{
+# minimize the crossing lines
+countCrossovers <- function(m=NULL){
   count <- 0
   for(i in 1:(ncol(m)-1))
   {

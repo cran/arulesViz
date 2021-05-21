@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2011 Michael Hahsler and Sudheer Chelluboina
+# Copyrigth (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,26 +16,88 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-matrix_arules <- function(rules, measure = "lift", control = NULL, ...){
+rules2matrix <- function(rules, measure = "support", reorder = "measure", ...) {
+  df <- DATAFRAME(rules, ...)
+  
+  m <- matrix(NA,
+    nrow = length(levels(df$RHS)),
+    ncol = length(levels(df$LHS)),
+    dimnames = list(levels(df$RHS), levels(df$LHS)))
+  
+  # attribute encoding contains the rule ids
+  enc <- m
+  
+  for (i in seq_len(nrow(df))) {
+    m[df$RHS[i], df$LHS[i]] <- df[[measure]][i]
+    enc[df$RHS[i], df$LHS[i]] <- i
+  }
+  
+
+  # reorder 
+  reorderTypes <- c("none", "measure", "support/confidence", "similarity")
+  reorderType <- pmatch(reorder , reorderTypes, nomatch = 0)
+  if(reorderType == 0) stop("Unknown reorder method: ", 
+    sQuote(reorder), 
+    " Valid reorder methods are: ", paste(sQuote(reorderTypes), 
+      collapse = ", "))
+  
+  if(reorderType == 2){
+    cm <- colMeans(m, na.rm = TRUE)
+    rm <- rowMeans(m, na.rm = TRUE)
+    m <- m[order(rm, decreasing = TRUE), order(cm, decreasing = TRUE)]
+    enc <- enc[order(rm, decreasing = TRUE), order(cm, decreasing = TRUE)]
+  
+    } else if(reorderType == 3){
+    cm <- colMeans(rules2matrix(rules, "support"), na.rm = TRUE)
+    rm <- rowMeans(rules2matrix(rules, "confidence"), na.rm = TRUE)
+    m <- m[order(rm, decreasing = TRUE), order(cm, decreasing = TRUE)]
+    enc <- enc[order(rm, decreasing = TRUE), order(cm, decreasing = TRUE)]
+  
+    } else if(reorderType == 4){
+    ### Note: I hope unique is stable and gives the same order as rules2matrix!
+    d <- dissimilarity(unique(lhs(rules)), method = "jaccard")
+    cm <- seriation::get_order(seriation::seriate(d))
+    rm <- rowMeans(m, na.rm = TRUE)
+    m <- m[order(rm, decreasing = FALSE), cm]
+    enc <- enc[order(rm, decreasing = FALSE), cm]
+  } 
+  
+  attr(m, "encoding") <- enc
+  
+  m
+}
+
+matrixplot <- function(rules, measure = "lift", control = NULL, ...){
  
-  engines <- c("default", "interactive", "base", "3d", "ggplot2", "plotly", "htmlwidget")
+  engines <- c("default", "ggplot2", "grid", "interactive", "base", "3d", "plotly", "htmlwidget")
+  if(control$engine == "help") {
+    message("Available engines for this plotting method are:\n", paste0(engines, collapse = ", "))
+    return(invisible(engines))  
+  }
+  
   m <- pmatch(control$engine, engines, nomatch = 0)
   if(m == 0) stop("Unknown engine: ", sQuote(control$engine), 
     " Valid engines: ", paste(sQuote(engines), collapse = ", "))
   control$engine <- engines[m] 
   
-  control <- c(control, list(...))
-  
   ### FIXME: fix max and control & reorder!
   if(pmatch(control$engine, c("plotly", "htmlwidget"), nomatch = 0) >0) { 
-    return(matrix_plotly(rules, measure = measure, control = control)) 
-  } else if(pmatch(control$engine, c("ggplot2"), nomatch = 0) >0) {
-    return(matrix_ggplot2(rules, measure = measure, control = control)) 
+    return(matrix_plotly(rules, measure = measure, control = control, ...)) 
+    
+  } else if(pmatch(control$engine, c("grid", "interactive", "3d", "base"), nomatch = 0) >0) {
+    return(matrix_grid(rules, measure = measure, control = control, ...)) 
   }
   
+  ### ggplot is default  
+  return(matrix_ggplot2(rules, measure = measure, control = control)) 
+}
+
+### this also does 3d and base
+matrix_grid <- function(rules, measure = "lift", control = NULL, ...) {
+
+  control <- c(control, list(...))
   control <- .get_parameters(control, list(
-    main = paste("Matrix with", length(rules), "rules"),
-    #col = gray.colors(100, 0.3, .8),
+    main = paste("Matrix for", length(rules), "rules"),
     engine = "default",
     col = default_colors(100),
     zlim = NULL,
@@ -82,35 +144,13 @@ matrix_arules <- function(rules, measure = "lift", control = NULL, ...){
   
 }
 
+matrix_int <- function(rules, measure, control, ...){
+  m <- rules2matrix(rules, measure, reorder = control$reorder)
 
-
-matrix_int <- function(rules, measure, control){
-  m <- rulesAsMatrix(rules, measure)
-  m_s <- rulesAsMatrix(rules, "support")
-  m_c <- rulesAsMatrix(rules, "confidence")
-
-  reorderTypes <- c("none", "measure", "support/confidence", "similarity")
-  reorderType <- pmatch(control$reorder , reorderTypes, nomatch = 0)
-  if(reorderType == 0) stop("Unknown reorder method: ", 
-    sQuote(control$reorder), 
-    " Valid reorder methods are: ", paste(sQuote(reorderTypes), 
-      collapse = ", "))
-  if(reorderType == 2){
-    cm <- colMeans(m, na.rm = TRUE)
-    rm <- rowMeans(m, na.rm = TRUE)
-    m <- m[order(rm, decreasing = FALSE), order(cm, decreasing = TRUE)]
-  } else if(reorderType == 3){
-    cm <- colMeans(m_s, na.rm = TRUE)
-    rm <- rowMeans(m_c, na.rm = TRUE)
-    m <- m[order(rm, decreasing = FALSE), order(cm, decreasing = TRUE)]
-  } else if(reorderType == 4){
-    ### Note: I hope unique is stable and gives the same order as rulesAsMatrix!
-    d <- dissimilarity(unique(lhs(rules)), method = "jaccard")
-    cm <- get_order(seriate(d))
-    rm <- rowMeans(m, na.rm = TRUE)
-    m <- m[order(rm, decreasing = FALSE), cm]
-  } 
+  # reverse rows so highest value is in the top-left hand corner
+  m <- m[nrow(m):1, ]
   
+  ## print labels
   writeLines("Itemsets in Antecedent (LHS)")
   print(colnames(m))
   writeLines("Itemsets in Consequent (RHS)")
@@ -120,10 +160,10 @@ matrix_int <- function(rules, measure, control){
   if (control$engine == "base") {
     do.call(image, c(list(t(m), col = control$col, xlab = "Antecedent (LHS)", 
       ylab = "Consequent (RHS)", main = control$main, 
-      sub=paste("Measure:", measure), axes=FALSE)), control$plot_options)
+      sub = paste("Measure:", measure), axes = FALSE), control$plot_options))
     if(control$axes) {
-      axis(1, labels=1:ncol(m), at=(0:(ncol(m)-1))/(ncol(m)-1))
-      axis(2, labels=1:nrow(m), at=(0:(nrow(m)-1))/(nrow(m)-1))
+      axis(1, labels = 1:ncol(m), at=(0:(ncol(m)-1))/(ncol(m)-1))
+      axis(2, labels = 1:nrow(m), at=(0:(nrow(m)-1))/(nrow(m)-1))
     }
     box()
   }
@@ -133,7 +173,7 @@ matrix_int <- function(rules, measure, control){
       ylab= "Antecedent (LHS)", main = control$main,
       type="h", pch=""), control$plot_options))
   }
-  else {
+  else { ### this is grid
     #dimnames(m) <- NULL
     #plot(levelplot(t(m), xlab = "Antecedent (LHS)", 
     #		ylab = "Consequent (RHS)", 
@@ -189,8 +229,8 @@ matrix_int <- function(rules, measure, control){
 ## 2 measures
 matrix_int2 <- function(rules, measure, control){
   
-  m1 <- rulesAsMatrix(rules, measure[1])
-  m2 <- rulesAsMatrix(rules, measure[2])
+  m1 <- rules2matrix(rules, measure[1])
+  m2 <- rules2matrix(rules, measure[2])
  
   ### FIXME: This does not work anymore!!!
   if(control$reorder == TRUE)
@@ -198,13 +238,13 @@ matrix_int2 <- function(rules, measure, control){
     if(is.null(control$reorderBy)) m_reorder <- m1
     else if(control$reorderBy == measure[1]) m_reorder <- m1
     else if(control$reorderBy == measure[2]) m_reorder <- m2
-    else m_reorder <- rulesAsMatrix(rules, control$reorderBy)
+    else m_reorder <- rules2matrix(rules, control$reorderBy)
     
     order <- .reorder(m_reorder, rules, method=control$reorderMethod, 
       control=control$reorderControl)
     
-    m1 <- permute(m1, order)
-    m2 <- permute(m2, order)
+    m1 <- seriation::permute(m1, order)
+    m2 <- seriation::permute(m2, order)
     
   }
   
@@ -235,11 +275,11 @@ matrix_int2 <- function(rules, measure, control){
   ## l = 0..100 but we use 10..90
   ## all colors are reversed
   
-  cols <- matrix(hcl(
-    h=floor(map(m1, c(260, 0))), 
-    l=floor(map(m2, c(100, 30))), 
-    c=floor(map(m2, c(30, 100)))), 
-    ncol=ncol(m1))
+  cols <- matrix(grDevices::hcl(
+    h = floor(map(m1, c(260, 0))), 
+    l = floor(map(m2, c(100, 30))), 
+    c = floor(map(m2, c(30, 100)))), 
+    ncol = ncol(m1))
   cols[is.na(m1) | is.na(m2)] <- NA
   
   gImage(cols, xlab="Antecedent (LHS)", ylab="Consequent (RHS)",
@@ -261,7 +301,7 @@ matrix_int2 <- function(rules, measure, control){
   
   steps <- 10
   mm <- outer(seq(260, 0, length.out=steps), seq(100, 30, length.out=steps), 
-    FUN=function(x, y) hcl(h=x, l=y, c=130-y))
+    FUN=function(x, y) grDevices::hcl(h=x, l=y, c=130-y))
   
   gImage(mm, 
     xScale = range(m2, na.rm=TRUE), yScale = range(m1, na.rm=TRUE),
@@ -307,22 +347,22 @@ matrix_int2 <- function(rules, measure, control){
     #l[is.na(l)] <- max(l, na.rm=TRUE) * 2
     #r[is.na(r)] <- max(r, na.rm=TRUE) * 2
     
-    ls <- seriate(l, method = method, control=control)
-    rs <- seriate(r, method = method, control=control)
+    ls <- seriation::seriate(l, method = method, control=control)
+    rs <- seriation::seriate(r, method = method, control=control)
     return(c(ls,rs))
   }else{
     
     if(method == "ConfSupp")
     {
-      ms <- rulesAsMatrix(rules,"support")
-      mc <- rulesAsMatrix(rules,"confidence")
+      ms <- rules2matrix(rules,"support")
+      mc <- rules2matrix(rules,"confidence")
       o1 <- order(colMeans(ms, na.rm=TRUE))
       o2 <- order(rowMeans(mc, na.rm=TRUE))
-      o <- ser_permutation(o2,o1)
+      o <- seriation::ser_permutation(o2,o1)
       return(o)
       
     }else{   
-      l <- seriate(m, method = method, control=control)
+      l <- seriation::seriate(m, method = method, control=control)
       return(l)
     }
   }
@@ -330,29 +370,29 @@ matrix_int2 <- function(rules, measure, control){
 }
 
 seriation_method_avgMeasure <- function(x, control){
-  ser_permutation(
+  seriation::ser_permutation(
     order(rowMeans(x, na.rm=TRUE)),
     order(colMeans(x, na.rm=TRUE)))
 }
 
 seriation_method_maxMeasure <- function(x, control){
-  ser_permutation(
+  seriation::ser_permutation(
     order(apply(x, MARGIN=1, max, na.rm=TRUE)),
     order(apply(x, MARGIN=2, max, na.rm=TRUE)))
 }
 
 seriation_method_medMeasure <- function(x, control){
-  ser_permutation(
+  seriation::ser_permutation(
     order(apply(x, MARGIN=1, median, na.rm=TRUE)),
     order(apply(x, MARGIN=2, median, na.rm=TRUE)))
 }
 
 
-set_seriation_method("matrix", "avg", seriation_method_avgMeasure, 
+seriation::set_seriation_method("matrix", "avg", seriation_method_avgMeasure, 
   "Order by average")
-set_seriation_method("matrix", "max", seriation_method_maxMeasure, 
+seriation::set_seriation_method("matrix", "max", seriation_method_maxMeasure, 
   "Order by maximum")
-set_seriation_method("matrix", "median", seriation_method_maxMeasure, 
+seriation::set_seriation_method("matrix", "median", seriation_method_maxMeasure, 
   "Order by median")
 
 
