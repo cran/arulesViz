@@ -1,3 +1,19 @@
+# arulesViz 1.5-1 (11/18/2021)
+
+## New features
+* plot method "grouped matrix" gained parameter grouped to pass on a grouped matrix.
+* associations2igraph gained parameter associationsAsNodes.
+* plot method graph with engine vizNetwork can now display itemsets.
+* plot gained parameter limit to print only the top limit rules.
+* plot method graph with ggraph (ggplot2) gained parameters asEdges = TRUE to represent associations as edges instead of nodes.
+
+## Changes
+* we use now a better check for installed suggested packages.
+* method graph uses now ggraph.
+
+## Bugfixes
+* plot method graph with engine htmlwidget shows not labels correctly.
+
 # arulesViz 1.5-0 (05/21/2021)
 
 ## New features

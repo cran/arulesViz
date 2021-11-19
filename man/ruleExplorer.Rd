@@ -16,7 +16,7 @@ ruleExplorer(x, sidebarWidth = 2, graphHeight = '600px')
   \item{graphHeight}{ height of the plots in pixels. Increase if you have a larger/higher resolution display. }
 }
 %\details{}
-%\value{}
+\value{returns a shiny app.}
 \author{
 Tyler Giallanza and Michael Hahsler. 
 Adapted from functions originally created by Andrew Brooks.

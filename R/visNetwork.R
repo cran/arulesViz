@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2021 Michael Hahsler
+# Copyright (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,94 +20,118 @@
 # FIXME: Implement max
 # FIXME: size and color...
 
-graph_visNetwork <- function(x, measure = "support", shading = "lift", 
-  control=NULL, ...) {
-  
-  if(class(x) != "rules") stop("Only implemented for rules!")
-  
-  control <- c(control, list(...))  
-  
-  control <- .get_parameters(control, list(
-    #main = paste("Graph for", length(x), "rules"),
-    itemCol = grDevices::hcl(h = 260),
-    nodeCol = default_colors(100, alpha = 0),
-    precision = 3,
-    igraphLayout = "layout_nicely",
-    interactive = TRUE,
-    engine = "visNetwork", 
-    max = 100,
-    selection_menu = TRUE,
-    degree_highlight =1
-  ))
-  
-  if(length(x) > control$max) {
-    warning("Too many rules supplied. Only plotting the best ", 
-      control$max, " rules using ", shading, 
-      " (change control parameter max if needed)", call. = FALSE)
-    x <- tail(x, n = control$max, by = shading, decreasing = FALSE)
-  }
-  
-  itemNodes <- which(itemFrequency(items(generatingItemsets(x)), 
-    type="absolute") >0)
-  
-  lhs <- LIST(lhs(x), decode=FALSE)
-  rhs <- LIST(rhs(x), decode=FALSE)
-  
-  itemNodes <- unique(c(unlist(lhs), unlist(rhs)))
-  ruleNodes <- paste("r", 1:length(x), sep='')
-  
-  nodeLabels <- c(itemLabels(x)[itemNodes], paste("rule", 1:length(ruleNodes)))
-  
-  allNodes <- factor(c(itemNodes, ruleNodes), levels = c(itemNodes, ruleNodes))
-  nodeType <- c(rep("item", length(itemNodes)), rep("rule", length(ruleNodes)))
-  
-  from_lhs <- match(unlist(lhs), allNodes)
-  to_lhs <- rep(1:length(x), sapply(lhs, length)) + length(itemNodes)
-  
-  to_rhs <- match(unlist(rhs), allNodes)
-  from_rhs <- rep(1:length(x), sapply(rhs, length)) + length(itemNodes)
-  
-  titleRules <- paste0('<B>[',1:length(x),']</B><BR>',
-    labels(x, itemSep= ',<BR>&nbsp;&nbsp;', 
-      ruleSep = '<BR>&nbsp;&nbsp; => ', 
-      setStart = '<B>{', setEnd = '}</B>'),
-    "<BR><BR>", 
-    apply(quality(x), MARGIN = 1, 
-      FUN = function(x) paste(names(x), "=", signif(x,control$precision), collapse = "<BR>")))
-  
-  title <- c(itemLabels(x)[itemNodes], titleRules)
-  
-  s <- quality(x)[[measure]]
-  size <- rep(1, length(nodeType))
-  size[nodeType == "rule"] <- map(s, c(1, 100)) 
-  
-  if(!is.na(shading)) {
-    s <- quality(x)[[shading]]
-    color <- c(rep(control$itemCol[1], length(itemNodes)),
-      .col_picker(map(s, c(0.9,0.1)), control$nodeCol)) 
-  } else color <- c(rep(control$itemCol[1], length(itemNodes)),
-    .col_picker(rep(.5, length(x)), control$nodeCol)) 
-
-  nodes <- data.frame(
-    id = as.integer(allNodes), 
-    label = nodeLabels, 
-    group = nodeType,
-    value = size,
-    color = color,
-    title = title,
-    shape = ifelse(nodeType == "rule", "circle", "box")
-  )
-  
-  edges <- data.frame(
-    from = c(from_lhs, from_rhs), 
-    to = c(to_lhs, to_rhs), 
-    arrows = "to") 
-  
-  visNetwork::visNetwork(nodes = nodes, edges = edges) %>% 
-    visNetwork::visNodes(scaling = list(label = list(enabled = TRUE))) %>%
-    visNetwork::visIgraphLayout(layout = control$igraphLayout) %>%
-    visNetwork::visOptions(highlightNearest = 
-        list(enabled = TRUE, degree = control$degree_highlight, hover = TRUE), 
-      nodesIdSelection = control$selection_menu
+graph_visNetwork <-
+  function(x,
+    measure = "support",
+    shading = "lift",
+    control = NULL,
+    ...) {
+    
+    control <- c(control, list(...))
+    control <- .get_parameters(
+      control,
+      list(
+        #main = paste("Graph for", length(x), "rules"),
+        itemCol = grDevices::hcl(h = 260),
+        nodeCol = default_colors(100, alpha = 0),
+        precision = 3,
+        igraphLayout = "layout_nicely",
+        interactive = TRUE,
+        engine = "visNetwork",
+        max = 100,
+        selection_menu = TRUE,
+        degree_highlight = 1
       )
-}
+    )
+    
+    x <- limit(x, control$max, shading, measure)
+    g <- associations2igraph(x)
+    
+    va <- igraph::get.vertex.attribute(g)
+    n_items <- sum(va$type == 1)
+    
+    titleAssoc <- 
+      if (is(x, "rules")) 
+        paste0(
+          '<B>[',
+          1:length(x),
+          ']</B><BR>',
+          labels(
+            x,
+            itemSep = ',<BR>&nbsp;&nbsp;',
+            ruleSep = '<BR>&nbsp;&nbsp; => ',
+            setStart = '<B>{',
+            setEnd = '}</B>'
+          ),
+          "<BR><BR>",
+          apply(
+            quality(x),
+            MARGIN = 1,
+            FUN = function(x)
+              paste(names(x), "=", signif(x, control$precision), collapse = "<BR>")
+          )
+        )
+    else
+        paste0(
+          '<B>[',
+          1:length(x),
+          ']</B><BR>',
+          labels(
+            x,
+            itemSep = ',<BR>&nbsp;&nbsp;',
+            setStart = '<B>{',
+            setEnd = '}</B>'
+          ),
+          "<BR><BR>",
+          apply(
+            quality(x),
+            MARGIN = 1,
+            FUN = function(x)
+              paste(names(x), "=", signif(x, control$precision), collapse = "<BR>")
+          )
+        )
+           
+    title <- c(va$label[va$type == 1], titleAssoc)
+    
+    size <- map(va[[measure]], c(1, 100))
+    size[va$type == 1] <- 1
+    
+    if (!is.null(shading)) {
+      color <- c(rep(control$itemCol[1], n_items),
+        .col_picker(map(va[[shading]][va$type == 2], c(0.9, 0.1)), control$nodeCol))
+    } else
+      color <- c(rep(control$itemCol[1], n_items),
+        .col_picker(rep(.5, sum(va$type == 2)), control$nodeCol))
+    
+    label <- va$label
+    label[va$type == 2] <- paste(substr(class(x), 1, nchar(class(x)) - 1L), seq_along(x))
+    
+    nodes <- data.frame(
+      id = seq_along(va$name),
+      label = label,
+      group = va$type,
+      value = size,
+      color = color,
+      title = title,
+      shape = ifelse(va$type == 2, "circle", "box")
+    )
+    
+    e <- igraph::as_data_frame(g, what = "edges")
+    edges <- data.frame(
+      from = as.integer(factor(e$from, levels = va$name)),
+      to = as.integer(factor(e$to, levels = va$name)),
+      arrows = "to"
+    )
+    
+    visNetwork::visNetwork(nodes = nodes, edges = edges) %>%
+      visNetwork::visIgraphLayout(layout = control$igraphLayout) %>%
+      visNetwork::visOptions(
+        highlightNearest =
+          list(
+            enabled = TRUE,
+            degree = control$degree_highlight,
+            hover = TRUE
+          ),
+        nodesIdSelection = control$selection_menu
+      )
+  }

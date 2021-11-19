@@ -5,6 +5,7 @@
 \alias{plot.rules}
 \alias{plot.grouped_matrix}
 \alias{plotly}
+\alias{guide_edge_colourbar}
 \title{Visualize Association Rules and Itemsets}
 \description{
 Methods (S3) to visualize association rules and itemsets.
@@ -18,9 +19,10 @@ standard plots with interactive manipulation
 and interactive HTML widget-based visualizations.
 }
 \usage{
-\method{plot}{rules}(x, method = NULL, measure = "support", shading = "lift", 
+\method{plot}{rules}(x, method = NULL, measure = "support", shading = "lift", limit = NULL, 
     interactive = NULL, engine = "default", data = NULL, control = NULL, ...)
-\method{plot}{itemsets}(x, method = NULL, measure = "support", shading = NA,
+
+\method{plot}{itemsets}(x, method = NULL, measure = "support", shading = NULL, limit = NULL,
     interactive = NULL, engine = "default", data = NULL, control = NULL, ...)
 }
 \arguments{
@@ -37,13 +39,16 @@ and interactive HTML widget-based visualizations.
   \item{shading}{ measure of interestingness used
     for the color of the points/arrows/nodes
     (e.g., "support", "confidence", "lift"). The default is "lift".
-    \code{NA} can be often used to suppress shading.}
+    \code{NULL} can be often used to suppress shading.}
+  \item{limit}{ A limit on the number of associations displayed. The top limit associations 
+    according to the measure specified in shading are chosen. }
   \item{interactive}{ deprecated. See parameter \code{engine} below. }
   \item{engine}{ a string indicating the plotting engine used to 
     render the plot. 
     The "default" engine uses (mostly) \pkg{ggplot2}.
     Other engines include "base" (base R plots), 
-    "grid", "interactive", "plotly", "visnetwork", "igraph", "graphviz", and "htmlwidget".
+    "grid", "interactive", "plotly", "visnetwork", "igraph", "graphviz", 
+    and "htmlwidget" (which can be embedded in RMarkdown).
     Note that not all engines are available for all methods.
     Specify "help" to get 
     a complete list of available engines for the selected visualization method.
@@ -161,6 +166,9 @@ Hahsler, M. (2016), Grouping association rules using lift. In C. Iyigun, R. Mogh
 \code{\link[seriation]{seriate}} in \pkg{seriation}
 }
 \examples{
+# Note: To speed example execution, not all examples are not run when using example("plot"). 
+# Use example("plot", run.dontrun = TRUE) to run all examples.
+
 data(Groceries)
 rules <- apriori(Groceries, parameter=list(support = 0.001, confidence = 0.8))
 rules
@@ -173,40 +181,38 @@ plot(rules, method = "help")
 # List the available engines for method "scatterplot"
 plot(rules, method = "scatterplot", engine = "help")
 
+\dontrun{
 # List control parameters for scatterplot with engine "ggplot2"
-\dontrun{plot(rules, method = "scatterplot", engine = "ggplot2", control = "help")}
+plot(rules, method = "scatterplot", engine = "ggplot2", control = "help")}
 
 
 ## Scatter plot
 #  Display a scatter plot using two quality measures
 plot(rules)
 
-# Scatter plot with custom measures
-plot(rules, measure = c("support", "lift"), shading = "confidence")
+# Scatter plot with custom measures and limiting the plot to the 100 with the 
+# largest value for for the shading measure. 
+plot(rules, measure = c("support", "lift"), shading = "confidence", limit = 100)
 
-# Custom color scale, , labels, theme and no title (ggplot2)
+\dontrun{
+# Custom color scale, labels, theme and no title (ggplot2)
 library(ggplot2)
-plot(rules, engine = "ggplot2", main = NULL) + 
+plot(rules, engine = "ggplot2", main = NULL, limit = 100) + 
   scale_color_gradient2(low = "red", mid = "gray90", high = "blue", 
     midpoint = 1, limits = c(0,12)) +
   labs(x = "Supp.", y = "Conf.", color = "Lift") + 
   theme_classic()
 
-# Scatter plot using other engines
-plot(rules, engine = "grid")
-library(colorspace) # for sequential_hcl
-plot(rules, engine = "grid", control = list(col=sequential_hcl(100)))
-
-plot(rules, engine = "base")
-  
 # Interactive scatter plot using the grid engine (selected rules are returned)
-\dontrun{sel <- plot(rules, engine = "interactive")}
+if(interactive()) {
+  sel <- plot(rules, engine = "interactive")
 
 # Create a html widget for interactive visualization (uses plotly)
-\donttest{plot(rules, engine = "htmlwidget")}
+  plot(rules, engine = "htmlwidget")}
+}
 
 # Two-key plot (a scatter plot with shading = "order")
-plot(rules, method = "two-key plot")
+plot(rules, method = "two-key plot", limit = 100)
 
   
 ## Matrix shading
@@ -220,103 +226,102 @@ subrules
 # that rules with similar lift are displayed close to each other.
 plot(subrules, method = "matrix")
 
-# Reorder rules differently
-plot(subrules, method = "matrix", control = list(reorder = "none"))
-plot(subrules, method = "matrix", control = list(reorder = "support/confidence"))
-plot(subrules, method = "matrix", control = list(reorder = "similarity"))
-
-# Use other engines
-plot(subrules, method = "matrix", engine = "grid")
-plot(subrules, method = "matrix", engine = "base")
-plot(subrules, method = "matrix", engine = "3d")
-
+\dontrun{
 # Interactive matrix plot 
 # * Engine interactive: identify rules by clicking on them (click outside to end) 
 # * Engine htmlwidget: hoover over rules to identify
-\dontrun{plot(subrules, method = "matrix", engine = "interactive")}
-\donttest{plot(subrules, method = "matrix", engine = "htmlwidget")}
+if(interactive()) {
+  plot(subrules, method = "matrix", engine = "interactive")
+  plot(subrules, method = "matrix", engine = "htmlwidget")
+}}
 
 
 ## Grouped matrix plot
 # Default engine is ggplot2
-plot(rules, method="grouped matrix")
-plot(rules, method="grouped matrix", shading = "confidence", k = 5)
+plot(rules, method="grouped matrix", k = 5)
 
+\dontrun{
 # Create a htmlwidget
-\donttest{plot(rules, method = "grouped matrix", engine = "htmlwidget")}
-
-# Engine grid
-plot(rules, method="grouped matrix", engine = "grid")
-plot(rules, method="grouped matrix", engine = "grid", 
-  col = grey.colors(10), 
-  gp_labels = grid::gpar(col = "blue", cex=1, fontface="italic"))
+plot(rules, method = "grouped matrix", engine = "htmlwidget")
 
 # Interactive grouped matrix plot
-\dontrun{sel <- plot(rules, method="grouped matrix", engine = "interactive")}
+if(interactive()){
+  sel <- plot(rules, method="grouped matrix", engine = "interactive")}
+}
 
 ## Graph representation
+# Default engine is ggplot2 with ggraph. Associations are represented as nodes.
+# We limit the number of rules to the 10 with the larges 
+# lift (measure used for shading)
+plot(subrules, method = "graph", limit = 10)
 
-# Graphs only work well with very few rules (we sample a few of the high-lift rules)
-subrules2 <- sample(subset(rules, lift > 5), 25)
+\dontrun{
+# Circular layout (see? ggraph for the meaning of the arguments)
+plot(subrules, method = "graph", layout = 'linear', circular = TRUE, limit = 10)
 
-# Default engine is ggplot2 with ggnetwork
-plot(subrules2, method = "graph")
+# Use igraph layouts (algorithm is passes on as ... to ggraph)
+plot(subrules, method = "graph", layout = 'igraph', 
+  ggraphdots = list(algorithm = 'graphopt', spring.const = 1, mass = 10), limit = 10)
 
-# Specify layout (from igraph) and edge and node representation
-# Note: The measures for size and color shading have to be specified in
-# the control list in nodes!
-plot(subrules2, method="graph", 
+# Specify edge and node representation
+library(ggplot2)
+plot(subrules, method = "graph", 
   control = list(
-    layout = igraph::with_graphopt(),
-    edges = ggnetwork::geom_edges(color = "grey80", 
-      arrow = arrow(length = unit(5, "pt"), type = "open"), alpha = .5),
-    nodes = ggnetwork::geom_nodes(aes(size = support, color = lift),  na.rm = TRUE),
-    nodetext = ggnetwork::geom_nodetext(aes(label = label), alpha = .6)
-  )) + 
+    edges = ggraph::geom_edge_link(
+      end_cap = ggraph::circle(4, "mm"),
+      start_cap = ggraph::circle(4, "mm"),
+      color = "black",
+      arrow = arrow(length = unit(2, "mm"), angle = 20, type = "closed"),
+      alpha = .2
+    ),
+    nodes = ggraph::geom_node_point(aes_string(size = "support", color = "lift")),
+    nodetext = ggraph::geom_node_label(aes_string(label = "label"), alpha = .8, repel = TRUE)
+  ),
+  limit = 10
+  ) + 
   scale_color_gradient(low = "yellow", high = "red") + 
-  scale_size(range = c(2, 15)) 
+  scale_size(range = c(2, 10)) 
+
+# ggplot also can represent associations as edges. Here a rules is represented as a set of 
+# arrows going from the LHS items to the RHS item. 
+plot(subrules, method = "graph", asEdges = TRUE, limit = 10)
+plot(subrules, method = "graph", asEdges = TRUE, circular = FALSE, limit = 10)}
 
 # Engine igraph
-plot(subrules2, method = "graph", engine = "igraph")
-
-# Custom colors
-plot(subrules2, method = "graph", engine = "igraph",
-  nodeCol = grey.colors(10), edgeCol = grey(.7), alpha = 1)
-
-# No shading for lift, set node color to gray and add 
-# labels for support
-plot(subrules2, method = "graph",  engine = "igraph", 
-  shading = NA, nodeCol = grey(.5), measureLabels = TRUE)
+plot(subrules, method = "graph", engine = "igraph", limit = 10)
+plot(subrules, method = "graph", engine = "igraph",
+  nodeCol = grey.colors(10), edgeCol = grey(.7), alpha = 1,
+  limit = 10)
 
 # Use plot_options to alter any aspect of the graph 
 # (see: https://igraph.org/r/doc/plot.common.html)
-plot(subrules2, method = "graph", engine = "igraph",
+plot(subrules, method = "graph", engine = "igraph",
   plot_options = list(
     edge.lty = 2, 
     vertex.label.cex = .6, 
     margin = c(.1,.1,.1,.1), 
-    asp = .5))
+    asp = .5),
+  limit = 10)
 
 # igraph layout generators can be used (see ? igraph::layout_)
-plot(subrules2, method="graph", engine = "igraph", layout=igraph::in_circle())
-plot(subrules2, method="graph", engine = "igraph",
-  layout = igraph::with_graphopt(spring.const = 5, mass = 50))
+plot(subrules, method="graph", engine = "igraph", layout = igraph::in_circle(), limit = 10)
 
+\dontrun{
 # Graph rendering using engine graphviz
-\dontrun{plot(subrules2, method = "graph", engine = "graphviz")}
+plot(subrules, method = "graph", engine = "graphviz", limit = 10)
 
+if(interactive()) {
 # Default interactive plot (using igraph's tkplot)
-\dontrun{plot(subrules2, method = "graph", engine = "interactive")}
+  plot(subrules, method = "graph", engine = "interactive", limit = 10)
 
 # Interactive graph as a html widget (using igraph layout)
-\donttest{
-plot(subrules2, method = "graph", engine = "htmlwidget")
-plot(subrules2, method = "graph", engine = "htmlwidget", 
-  igraphLayout = "layout_in_circle")
-}
+  plot(subrules, method = "graph", engine = "htmlwidget", limit = 10)
+  plot(subrules, method = "graph", engine = "htmlwidget", 
+    igraphLayout = "layout_in_circle", limit = 10)}}
 
 ## Parallel coordinates plot
-plot(subrules2, method = "paracoord")
+plot(subrules, method = "paracoord", limit = 10)
+
 
 ## Doubledecker and mosaic plot
 # Uses functions in package vcd
@@ -325,7 +330,7 @@ plot(subrules2, method = "paracoord")
 oneRule <- sample(rules, 1)
 inspect(oneRule)
 plot(oneRule, method = "doubledecker", data = Groceries)
-plot(oneRule, method = "mosaic", data = Groceries)
+
 
 ## Visualizing itemsets
 data(Groceries)
@@ -333,25 +338,31 @@ itemsets <- eclat(Groceries, parameter = list(support = 0.02, minlen = 2))
 
 # default is a scatter plot with ggplot2
 plot(itemsets)
-plot(itemsets, engine = "grid")
-plot(itemsets, engine = "base")
 
-plot(itemsets, method = "graph")
-plot(itemsets, method = "graph", engine = "igraph")
+plot(itemsets, method = "graph", limit = 10)
 
-plot(itemsets, method = "paracoord", alpha = .5)
+\dontrun{
+plot(itemsets, method = "graph", asEdges = TRUE, limit = 10)
+plot(itemsets, method = "graph", asEdges = TRUE, circular = FALSE, limit = 10) + 
+  theme(plot.margin = margin(10, 10, 30, 20, "mm"))}
 
-## Add more quality measures to use for the scatter plot
+plot(itemsets, method = "paracoord", alpha = .5, limit = 10)
 
+# Add more quality measures to use for the scatter plot
 quality(itemsets) <- interestMeasure(itemsets, transactions = Groceries)
 head(quality(itemsets))
 plot(itemsets, measure = c("support", "allConfidence"), shading = "lift")
 
-## Save HTML widget as web page
 \dontrun{
+# Save HTML widget as web page
 p <- plot(rules, engine = "html")
 htmlwidgets::saveWidget(p, "arules.html", selfcontained = FALSE)
-browseURL("arules.html")}
 # Note: self-contained seems to make the browser slow.
+
+# inspect the widget
+browseURL("arules.html")
+
+# clean up
+unlink(c("arules.html", "arules_files"), recursive = TRUE)}
 }
 \keyword{ hplot }

@@ -1,6 +1,6 @@
 #######################################################################
 # arulesViz - Visualizing Association Rules and Frequent Itemsets
-# Copyrigth (C) 2021 Michael Hahsler
+# Copyright (C) 2021 Michael Hahsler
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,24 +16,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
-.installed <- function(pkg) !inherits(try(utils::installed.packages()[pkg,],
-  silent=TRUE), "try-error")
-
-## color paletts
-.col_picker <- function(level, palette, alpha=NULL) {
-  col <- palette[floor(level*(length(palette)-1))+1]
-  if(!is.null(alpha)) {
-    col <- apply(sapply(col, grDevices::col2rgb)/255, 2, 
-      function(x) 
-        grDevices::rgb(x[1], x[2], x[3], alpha=alpha))
-  }
-  col
+limit <- function(x, max, shading = NULL, measure = NULL, quiet = FALSE) {
+  if (is.null(max)) return(x)
+  if (length(x) <= max) return(x)
+  
+  l <- if (!is.null(shading)) shading[1] else measure[1]
+  
+  if (!quiet)
+    warning(
+      "Too many ", class(x), " supplied. Only plotting the best ",
+      max, " using ",
+      if (!is.null(l)) sQuote(l) else "the original order",
+      " (change control parameter max if needed).",
+      call. = FALSE
+    )
+  
+  head(x,
+    n = max,
+    by = l,
+    decreasing = TRUE)
 }
-
-gray_hcl <- function(n, alpha = 1) colorspace::sequential_hcl(n, c.=0, alpha = alpha)
-
-### default are gray - > red
-default_colors <- function(n , alpha = 1) 
-  grDevices::colorRampPalette(c("#EE0000", "#EE9999","#EEEEEE"), alpha = alpha)(n)
-

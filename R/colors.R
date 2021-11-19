@@ -17,7 +17,17 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-## save rules/itemsets as a graph for external programs
+## color palettes
+.col_picker <- function(level, palette, alpha = NULL) {
+  col <- palette[floor(level * (length(palette) - 1)) + 1]
+  if (!is.null(alpha)) {
+    col <- apply(sapply(col, grDevices::col2rgb) / 255, 2,
+      function(x)
+        grDevices::rgb(x[1], x[2], x[3], alpha = alpha))
+  }
+  col
+}
 
-saveAsGraph <- function(x, file, format = "graphml", ...)
-  igraph::write.graph(associations2igraph(x, ...), file, format = format)
+### default are gray - > red
+default_colors <- function(n , alpha = 1)
+  grDevices::colorRampPalette(c("#EE0000", "#EE9999", "#EEEEEE"), alpha = alpha)(n)
