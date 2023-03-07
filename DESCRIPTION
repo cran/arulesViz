@@ -1,10 +1,11 @@
 Package: arulesViz
-Version: 1.5-1
-Date: 2021-11-18
+Version: 1.5-2
+Date: 2023-03-07
 Title: Visualizing Association Rules and Frequent Itemsets
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
-                email = "mhahsler@lyle.smu.edu"),
-            person("Giallanza", "Tyler", role = c("ctb")),
+	    email = "mhahsler@lyle.smu.edu",
+	    comment = c(ORCID = "0000-0003-2716-1405")),
+	    person("Giallanza", "Tyler", role = c("ctb")),
             person("Sudheer", "Chelluboina", role = c("ctb"))
             )
 Depends: arules (>= 1.6.0)
@@ -17,13 +18,13 @@ Description: Extends package 'arules' with various visualization techniques for 
 License: GPL-3
 URL: https://github.com/mhahsler/arulesViz
 BugReports: https://github.com/mhahsler/arulesViz/issues
-Copyright: (C) 2018 Michael Hahsler, Tyler Giallanza and Sudheer
-        Chelluboina
+Copyright: (C) 2021 Michael Hahsler
 NeedsCompilation: no
-Packaged: 2021-11-19 16:24:58 UTC; hahsler
-Author: Michael Hahsler [aut, cre, cph],
+Packaged: 2023-03-07 14:49:21 UTC; hahsler
+Author: Michael Hahsler [aut, cre, cph]
+    (<https://orcid.org/0000-0003-2716-1405>),
   Giallanza Tyler [ctb],
   Sudheer Chelluboina [ctb]
 Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
 Repository: CRAN
-Date/Publication: 2021-11-19 17:40:07 UTC
+Date/Publication: 2023-03-07 16:50:02 UTC

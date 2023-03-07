@@ -1,3 +1,9 @@
+# arulesViz 1.5-2 (03/03/2023)
+
+## Bugfixes
+* S3 method registration for inspectDT.default
+* print.gInteraction has now parameters (x, ...) to match the print generic.
+
 # arulesViz 1.5-1 (11/18/2021)
 
 ## New features
@@ -12,7 +18,7 @@
 * method graph uses now ggraph.
 
 ## Bugfixes
-* plot method graph with engine htmlwidget shows not labels correctly.
+* plot method graph with engine htmlwidget shows now labels correctly.
 
 # arulesViz 1.5-0 (05/21/2021)
 
