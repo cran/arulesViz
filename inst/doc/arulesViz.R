@@ -29,14 +29,14 @@ summary(Groceries)
 ###################################################
 ### code chunk number 5: arulesViz.Rnw:267-269
 ###################################################
-rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5))
+rules <- apriori(Groceries, parameter = list(support = 0.001, confidence = 0.5))
 rules
 
 
 ###################################################
 ### code chunk number 6: arulesViz.Rnw:277-278
 ###################################################
-inspect(head(rules, n = 3, by ="lift"))
+inspect(head(rules, n = 3, by = "lift"))
 
 
 ###################################################
@@ -70,14 +70,16 @@ plot(rules, method = "two-key plot")
 
 
 ###################################################
-### code chunk number 12: arulesViz.Rnw:402-404 (eval = FALSE)
+### code chunk number 12: arulesViz.Rnw:402-406 (eval = FALSE)
 ###################################################
-## sel <- plot(rules, measure=c("support", "lift"), shading = "confidence",
-##             interactive = TRUE)
+## sel <- plot(rules,
+##   measure = c("support", "lift"), shading = "confidence",
+##   interactive = TRUE
+## )
 
 
 ###################################################
-### code chunk number 13: arulesViz.Rnw:481-483
+### code chunk number 13: arulesViz.Rnw:483-485
 ###################################################
 subrules <- rules[quality(rules)$confidence > 0.8]
 subrules
@@ -108,13 +110,13 @@ plot(rules, method = "grouped", control = list(k = 50))
 
 
 ###################################################
-### code chunk number 18: arulesViz.Rnw:744-745 (eval = FALSE)
+### code chunk number 18: arulesViz.Rnw:746-747 (eval = FALSE)
 ###################################################
 ## sel <- plot(rules, method = "grouped", interactive = TRUE)
 
 
 ###################################################
-### code chunk number 19: arulesViz.Rnw:768-769
+### code chunk number 19: arulesViz.Rnw:770-771
 ###################################################
 subrules2 <- head(rules, n = 10, by = "lift")
 
@@ -126,7 +128,7 @@ plot(subrules2, method = "graph")
 
 
 ###################################################
-### code chunk number 21: arulesViz.Rnw:813-814 (eval = FALSE)
+### code chunk number 21: arulesViz.Rnw:815-816 (eval = FALSE)
 ###################################################
 ## saveAsGraph(head(rules, n = 1000, by = "lift"), file = "rules.graphml")
 
@@ -144,7 +146,7 @@ plot(subrules2, method = "paracoord", control = list(reorder = TRUE))
 
 
 ###################################################
-### code chunk number 24: arulesViz.Rnw:913-915
+### code chunk number 24: arulesViz.Rnw:915-917
 ###################################################
 oneRule <- sample(rules, 1)
 inspect(oneRule)
